@@ -346,7 +346,7 @@ Setiap kasir harus **buka shift** sebelum transaksi dan **tutup shift** di akhir
 ## Kontak Support
 
 Jika ada pertanyaan atau masalah teknis, hubungi:
-- **Admin Sistem**: [Your Contact]
+- **Admin Sistem**: [Jonas Banurea]
 - **Email**: [banurea.jonas@gmail.com]
 
 ---
