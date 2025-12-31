@@ -1,4 +1,4 @@
-# 📦 Toko Obat Rotua - Package Contents
+# 📦 Toko Obat Ro Tua - Package Contents
 
 ## ✅ Step 1 - COMPLETED
 
@@ -164,7 +164,7 @@ setup.bat
 composer install
 copy .env.example .env
 php artisan key:generate
-# Create database: toko_obat_rotua
+# Create database: toko_obat_ro_tua
 php artisan migrate
 php artisan db:seed
 php artisan serve

@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
         $owner = User::firstOrCreate(
             ['email' => 'owner@rotua.test'],
             [
-                'name' => 'Owner Rotua',
+                'name' => 'Owner Ro Tua',
                 'password' => Hash::make('password'),
             ]
         );
@@ -28,7 +28,7 @@ class UserSeeder extends Seeder
         $kasir = User::firstOrCreate(
             ['email' => 'kasir@rotua.test'],
             [
-                'name' => 'Kasir Rotua',
+                'name' => 'Kasir Ro Tua',
                 'password' => Hash::make('password'),
             ]
         );
@@ -38,7 +38,7 @@ class UserSeeder extends Seeder
         $adminGudang = User::firstOrCreate(
             ['email' => 'gudang@rotua.test'],
             [
-                'name' => 'Admin Gudang Rotua',
+                'name' => 'Admin Gudang Ro Tua',
                 'password' => Hash::make('password'),
             ]
         );

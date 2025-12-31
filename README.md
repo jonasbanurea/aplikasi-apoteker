@@ -1,4 +1,4 @@
-# Toko Obat Rotua - Aplikasi Manajemen Apotek
+# Toko Obat Ro Tua - Aplikasi Manajemen Apotek
 
 ![Laravel](https://img.shields.io/badge/Laravel-10.x-red)
 ![PHP](https://img.shields.io/badge/PHP-8.2+-blue)
@@ -26,7 +26,7 @@ Aplikasi manajemen apotek dengan RBAC (Owner, Kasir, Admin Gudang), POS FEFO, pe
 ## Instalasi Cepat (Windows + XAMPP)
 1) Clone / ekstrak repo, masuk folder project.
 2) `copy .env.example .env` lalu edit DB di `.env` (db name/user/pass). Opsional: `MAIL_MAILER=log`.
-3) Start Apache & MySQL (XAMPP), buat DB `toko_obat_rotua`.
+3) Start Apache & MySQL (XAMPP), buat DB `toko_obat_ro_tua`.
 4) `composer install`
 5) `php artisan key:generate`
 6) `php artisan migrate --seed`
@@ -59,4 +59,4 @@ config/stock.php, reports.php, mail.php
 - Login ditolak: user mungkin non-aktif (`is_active=false`).
 
 ## Lisensi
-Aplikasi internal Toko Obat Rotua.
+Aplikasi internal Toko Obat Ro Tua.

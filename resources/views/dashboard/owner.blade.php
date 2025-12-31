@@ -7,7 +7,7 @@
 <div class="row mb-4">
     <div class="col-12">
         <h2>Selamat Datang, {{ auth()->user()->name }}!</h2>
-        <p class="text-muted">Dashboard Owner - Toko Obat Rotua</p>
+        <p class="text-muted">Dashboard Owner - Toko Obat Ro Tua</p>
     </div>
 </div>
 

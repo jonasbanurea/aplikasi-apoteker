@@ -1,4 +1,4 @@
-# User Acceptance Test (UAT) - Toko Obat Rotua
+# User Acceptance Test (UAT) - Toko Obat Ro Tua
 
 ## Cara Pakai
 - Jalankan `php artisan migrate --seed` sebelum testing untuk memastikan data dasar tersedia.

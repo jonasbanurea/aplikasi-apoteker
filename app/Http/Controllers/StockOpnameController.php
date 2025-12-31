@@ -31,9 +31,18 @@ class StockOpnameController extends Controller
             ->paginate(15)
             ->withQueryString();
 
+        $recentItems = StockOpnameItem::with([
+                'product:id,nama_dagang,harga_jual',
+                'opname:id,opname_date',
+            ])
+            ->latest('created_at')
+            ->take(50)
+            ->get();
+
         return view('stock_opnames.index', [
             'opnames' => $opnames,
             'status' => $status,
+            'recentItems' => $recentItems,
         ]);
     }
 

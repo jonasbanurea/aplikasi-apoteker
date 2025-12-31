@@ -25,11 +25,11 @@ Panduan ini menjelaskan cara mengambil aplikasi dari GitHub, menyiapkan lingkung
    ```
 3. Clone repo:
    ```
-   git clone <URL_REPO_GITHUB> toko-obat-rotua
+   git clone <URL_REPO_GITHUB> toko-obat-ro-tua
    ```
 4. Masuk ke folder proyek:
    ```
-   cd toko-obat-rotua
+   cd toko-obat-ro-tua
    ```
 
 ### 3) Konfigurasi Environment
@@ -41,7 +41,7 @@ Panduan ini menjelaskan cara mengambil aplikasi dari GitHub, menyiapkan lingkung
    - `DB_CONNECTION=mysql`
    - `DB_HOST=127.0.0.1`
    - `DB_PORT=3306`
-   - `DB_DATABASE=toko_obat_rotua`
+   - `DB_DATABASE=toko_obat_ro_tua`
    - `DB_USERNAME=root`
    - `DB_PASSWORD=` (kosong jika default XAMPP, atau isi jika Anda set password)
    - `APP_URL=http://localhost:8000` (atau http://127.0.0.1:8000)
@@ -50,7 +50,7 @@ Panduan ini menjelaskan cara mengambil aplikasi dari GitHub, menyiapkan lingkung
 ### 4) Siapkan Database
 1. Jalankan **XAMPP Control Panel**, start **Apache** dan **MySQL**.
 2. Buka phpMyAdmin: http://localhost/phpmyadmin.
-3. Buat database baru bernama `toko_obat_rotua` (Collation utf8mb4_general_ci).
+3. Buat database baru bernama `toko_obat_ro_tua` (Collation utf8mb4_general_ci).
 
 ### 5) Install Dependency PHP
 Pastikan Composer memakai PHP XAMPP (8.2). Di folder proyek:
@@ -91,7 +91,7 @@ Akses di browser: http://localhost:8000
 ### 10) Pengiriman via ZIP (Alternatif)
 Jika tidak ingin install Git di laptop client:
 1. Download ZIP repo dari GitHub (`Code` → `Download ZIP`).
-2. Extract ke folder, contoh `C:\projects\toko-obat-rotua`.
+2. Extract ke folder, contoh `C:\projects\toko-obat-ro-tua`.
 3. Lanjutkan langkah konfigurasi mulai dari **Langkah 3** (env) hingga selesai.
 
 ## Troubleshooting Cepat
@@ -104,8 +104,8 @@ Jika tidak ingin install Git di laptop client:
 ## Ringkasan Perintah
 ```
 # Clone repo
-git clone <URL_REPO_GITHUB> toko-obat-rotua
-cd toko-obat-rotua
+git clone <URL_REPO_GITHUB> toko-obat-ro-tua
+cd toko-obat-ro-tua
 
 # Setup
 copy .env.example .env
@@ -133,7 +133,7 @@ Goal: setiap kali laptop dinyalakan, service sudah siap dan browser membuka apli
 Simpan file batch, misal `start-app.bat` di folder proyek (atau lokasi lain), isi:
 ```
 @echo off
-cd /d C:\projects\toko-obat-rotua
+cd /d C:\projects\toko-obat-ro-tua
 REM start Apache & MySQL XAMPP (sesuaikan path xampp-control.exe)
 start "" "C:\xampp\xampp-control.exe" --startapache --startmysql
 REM tunggu 8 detik agar MySQL siap

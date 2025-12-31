@@ -268,6 +268,20 @@
             @endhasanyrole
 
             @hasanyrole('owner|admin_gudang|kasir')
+            @php $hasShifts = Route::has('shifts.index'); @endphp
+            @if($hasShifts)
+            <li class="nav-item mt-3">
+                <small class="text-muted px-3">SHIFT & ABSENSI</small>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('shifts.*') ? 'active' : '' }}" href="{{ route('shifts.index') }}">
+                    <i class="bi bi-clock-history"></i> Absensi Kasir
+                </a>
+            </li>
+            @endif
+            @endhasanyrole
+
+            @hasanyrole('owner|admin_gudang|kasir')
             @php $hasPurchases = Route::has('purchases.index'); @endphp
             @if($hasPurchases)
             <li class="nav-item mt-3">

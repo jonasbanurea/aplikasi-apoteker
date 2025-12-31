@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo   Toko Obat Rotua - Setup Script
+echo   Toko Obat Ro Tua - Setup Script
 echo ========================================
 echo.
 

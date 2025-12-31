@@ -101,7 +101,7 @@
                         </form>
                     </div>
                     <div class="card-footer text-center text-muted py-3">
-                        <small>&copy; {{ date('Y') }} Toko Obat Rotua</small>
+                        <small>&copy; {{ date('Y') }} Toko Obat Ro Tua</small>
                     </div>
                 </div>
                 

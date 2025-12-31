@@ -106,4 +106,41 @@
         </div>
     </div>
 </div>
+
+<div class="card mt-4">
+    <div class="card-body">
+        <h5 class="mb-3">Detail Item Opname</h5>
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Nama Barang Terjual</th>
+                        <th class="text-end">Harga Barang Terjual</th>
+                        <th class="text-end">Jumlah Barang Terjual</th>
+                        <th class="text-end">Sisa Stok</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($recentItems as $item)
+                        @php
+                            $terjual = $item->diff_qty < 0 ? abs($item->diff_qty) : 0;
+                        @endphp
+                        <tr>
+                            <td>{{ optional($item->opname?->opname_date)->format('d M Y') }}</td>
+                            <td>{{ $item->product?->nama_dagang ?? '-' }}</td>
+                            <td class="text-end">Rp {{ number_format($item->product?->harga_jual ?? 0, 2, ',', '.') }}</td>
+                            <td class="text-end">{{ $terjual }}</td>
+                            <td class="text-end">{{ $item->physical_qty }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">Belum ada item opname</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 @endsection

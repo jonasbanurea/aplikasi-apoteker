@@ -1,4 +1,4 @@
-## Toko Obat Rotua - Change Log
+## Toko Obat Ro Tua - Change Log
 
 ### Step 1 - Setup Proyek (Completed ✅)
 **Tanggal:** 30 Desember 2025

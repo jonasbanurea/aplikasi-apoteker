@@ -1,4 +1,4 @@
-# Quick Start Guide - Toko Obat Rotua
+# Quick Start Guide - Toko Obat Ro Tua
 
 ## Panduan Instalasi Cepat (5 Menit)
 
@@ -15,13 +15,13 @@ php artisan key:generate
 
 ### 3️⃣ Buat Database
 - Buka phpMyAdmin: http://localhost/phpmyadmin
-- Buat database baru: **toko_obat_rotua**
+- Buat database baru: **toko_obat_ro_tua**
 - Collation: utf8mb4_unicode_ci
 
 ### 4️⃣ Setup Database di .env
 Edit file `.env`:
 ```env
-DB_DATABASE=toko_obat_rotua
+DB_DATABASE=toko_obat_ro_tua
 DB_USERNAME=root
 DB_PASSWORD=
 ```

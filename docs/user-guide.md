@@ -1,4 +1,4 @@
-# Panduan Pengguna Toko Obat Rotua
+# Panduan Pengguna Toko Obat Ro Tua
 
 ## Daftar Isi
 - [Pendahuluan](#pendahuluan)
@@ -17,7 +17,7 @@
 
 ## Pendahuluan
 
-**Toko Obat Rotua** adalah sistem informasi manajemen apotek yang mengelola penjualan, pembelian, stok, dan laporan dengan pembagian peran:
+**Toko Obat Ro Tua** adalah sistem informasi manajemen apotek yang mengelola penjualan, pembelian, stok, dan laporan dengan pembagian peran:
 
 - **Owner**: Akses penuh (master data, laporan, manajemen user, persetujuan opname).
 - **Kasir**: Transaksi penjualan, shift, laporan terbatas.
@@ -351,4 +351,4 @@ Jika ada pertanyaan atau masalah teknis, hubungi:
 
 ---
 
-**Terima kasih telah menggunakan Toko Obat Rotua!**
+**Terima kasih telah menggunakan Toko Obat Ro Tua!**

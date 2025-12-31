@@ -36,7 +36,7 @@ class BackupController extends Controller
         if (!File::exists($backupDir)) {
             File::makeDirectory($backupDir, 0755, true);
         }
-        $zipPath = $backupDir . DIRECTORY_SEPARATOR . 'rotua-backup-' . $timestamp . '.zip';
+        $zipPath = $backupDir . DIRECTORY_SEPARATOR . 'ro-tua-backup-' . $timestamp . '.zip';
 
         try {
             $this->dumpDatabase($dumpFile);
@@ -57,7 +57,7 @@ class BackupController extends Controller
         $userProfile = env('USERPROFILE');
         if ($userProfile) {
             $documents = $userProfile . DIRECTORY_SEPARATOR . 'Documents';
-            return $documents . DIRECTORY_SEPARATOR . 'toko-obat-rotua-backup';
+            return $documents . DIRECTORY_SEPARATOR . 'toko-obat-ro-tua-backup';
         }
 
         return storage_path('app/backups');

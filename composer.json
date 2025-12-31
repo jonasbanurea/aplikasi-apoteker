@@ -1,7 +1,7 @@
 {
     "name": "laravel/laravel",
     "type": "project",
-    "description": "Toko Obat Rotua - Pharmacy Management Application",
+    "description": "Toko Obat Ro Tua - Pharmacy Management Application",
     "keywords": ["laravel", "framework", "pharmacy"],
     "license": "MIT",
     "require": {

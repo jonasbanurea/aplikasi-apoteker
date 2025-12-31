@@ -1,4 +1,4 @@
-# Toko Obat Rotua - Laravel Pharmacy Application
+# Toko Obat Ro Tua - Laravel Pharmacy Application
 
 ## Project Overview
 A complete pharmacy management application with role-based access control.
