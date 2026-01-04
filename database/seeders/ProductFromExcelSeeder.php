@@ -58,10 +58,11 @@ class ProductFromExcelSeeder extends Seeder
                     $hrgJual = $worksheet->getCell('I' . $row)->getValue() ?? 0;
                     $expDate = $worksheet->getCell('J' . $row)->getValue();
                     
-                    // Tambahkan informasi sheet (RAK A/B/D) ke lokasi jika belum ada
-                    if (!empty($lokBarang) && !str_contains(strtoupper($lokBarang), strtoupper($sheetName))) {
+                    // Tambahkan informasi sheet (RAK A/B/D) ke lokasi
+                    // Format: "RAK A - RAK A1", "RAK B - RAK B3", dst
+                    if (!empty($lokBarang)) {
                         $lokBarang = $sheetName . ' - ' . $lokBarang;
-                    } elseif (empty($lokBarang)) {
+                    } else {
                         $lokBarang = $sheetName;
                     }
                     
