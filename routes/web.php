@@ -47,6 +47,7 @@ Route::middleware('auth')->group(function () {
 
     // Master Data - RBAC handled in controllers
     Route::resource('suppliers', SupplierController::class)->except(['show']);
+    Route::get('products/export', [ProductController::class, 'export'])->name('products.export');
     Route::resource('products', ProductController::class)->except(['show']);
 
     // Shift Kasir & Z-Report

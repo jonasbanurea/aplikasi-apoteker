@@ -9,11 +9,16 @@
         <h4 class="mb-0">Daftar Produk / Obat</h4>
         <small class="text-muted">Kelola master produk dan harga jual</small>
     </div>
-    @if(auth()->user()->hasAnyRole('owner', 'admin_gudang'))
-    <a href="{{ route('products.create') }}" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Tambah Produk
-    </a>
-    @endif
+    <div class="d-flex gap-2">
+        <a href="{{ route('products.export') }}" class="btn btn-success">
+            <i class="bi bi-file-earmark-excel"></i> Export Excel
+        </a>
+        @if(auth()->user()->hasAnyRole('owner', 'admin_gudang'))
+        <a href="{{ route('products.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Tambah Produk
+        </a>
+        @endif
+    </div>
 </div>
 
 <div class="card">

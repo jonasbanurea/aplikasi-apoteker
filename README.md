@@ -9,7 +9,7 @@ Aplikasi manajemen apotek dengan RBAC (Owner, Kasir, Admin Gudang), POS FEFO, pe
 ## Fitur Utama
 - Autentikasi & RBAC (Spatie Permission), proteksi user non-aktif
 - Dashboard per role dengan grafik, top produk, alert stok/expired
-- Master data supplier & produk
+- Master data supplier & produk (import/export Excel)
 - Pembelian/penerimaan + batch merge, konsinyasi, hutang sederhana
 - Stok per batch, kartu stok (IN/OUT/ADJUST), stock opname + approval
 - POS penjualan FEFO, struk thermal 58mm
@@ -35,6 +35,7 @@ Aplikasi manajemen apotek dengan RBAC (Owner, Kasir, Admin Gudang), POS FEFO, pe
 
 ## Perintah Berguna
 - Reset data uji: `php artisan migrate:fresh --seed`
+- Import produk dari Excel: `php artisan db:seed --class=ProductFromExcelSeeder`
 - Clear cache: `php artisan cache:clear && php artisan config:clear && php artisan route:clear && php artisan view:clear`
 - Jalankan di port lain: `php artisan serve --port=8001`
 
@@ -51,6 +52,11 @@ config/stock.php, reports.php, mail.php
 ## Backup (Owner Menu)
 - Menu: Owner → Backup
 - Hasil: ZIP berisi database.sql + public + storage/app/public ke Documents (default). Set `MYSQLDUMP_PATH` jika diperlukan (contoh: `C:\xampp\mysql\bin\mysqldump.exe`).
+
+## Import & Export Data Produk
+- Import dari Excel: File Excel harus disimpan di folder `docs/` dengan format kolom yang sesuai (NO, NAMA BARANG, SEDIAAN, LOK BARANG, STOK, KATEGORI, HRG BELI, MARGIN, HRG JUAL, EXP DATE)
+- Export ke Excel: Klik tombol "Export Excel" di halaman Produk untuk mengunduh daftar produk terbaru
+- File contoh: `docs/NAMA -NAMA OBAT DI TOKO OBAT RO TUA.xlsx`
 
 ## Troubleshooting Ringkas
 - DB unknown: pastikan DB dibuat dan .env sesuai.

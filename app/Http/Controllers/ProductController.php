@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductsExport;
 use App\Http\Requests\ProductRequest;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductController extends Controller
 {
@@ -74,6 +76,14 @@ class ProductController extends Controller
         return redirect()
             ->route('products.index')
             ->with('success', 'Produk berhasil dihapus.');
+    }
+
+    public function export()
+    {
+        return Excel::download(
+            new ProductsExport,
+            'daftar-obat-' . date('Y-m-d-His') . '.xlsx'
+        );
     }
 
     private function mapData(ProductRequest $request): array
