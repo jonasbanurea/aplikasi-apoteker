@@ -57,17 +57,34 @@ Pastikan Composer memakai PHP XAMPP (8.2). Di folder proyek:
 ```
 composer install
 ```
-Jika ada pesan `ext-...` missing, aktifkan extension di `C:\xampp\php\php.ini` (hapus `;` pada baris extension yang dibutuhkan), lalu restart Apache.
+
+**PENTING - Extension PHP yang Dibutuhkan:**
+Aktivasikan extension berikut di `C:\xampp\php\php.ini` (hapus `;` di awal baris):
+```ini
+extension=gd          ; Untuk export/import Excel (gambar)
+extension=zip         ; Untuk export/import Excel (kompresi)
+extension=intl        ; Untuk internasionalisasi
+extension=openssl     ; Untuk keamanan koneksi
+```
+Setelah edit php.ini, **restart Apache** di XAMPP Control Panel.
 
 ### 6) Generate Key & Migrasi
 ```
 php artisan key:generate
 php artisan migrate --seed
 ```
-Seeder akan membuat data awal termasuk user default:
-- Owner: owner@rotua.test / password
-- Kasir: kasir@rotua.test / password
-- Admin Gudang: gudang@rotua.test / password
+Seeder akan membuat data awal termasuk:
+- **User default:**
+  - Owner: owner@rotua.test / password
+  - Kasir: kasir@rotua.test / password
+  - Admin Gudang: gudang@rotua.test / password
+- **Produk dari Excel:** 40+ produk dari file `docs/NAMA -NAMA OBAT DI TOKO OBAT RO TUA.xlsx`
+- **Stock batches & movements:** Otomatis dibuat untuk produk dengan stok
+
+**Catatan:** Jika ingin import produk tambahan nanti, gunakan:
+```
+php artisan db:seed --class=ProductFromExcelSeeder
+```
 
 ### 7) (Opsional) Build Asset Front-end
 Jika perlu recompile asset:
@@ -98,18 +115,34 @@ Jika tidak ingin install Git di laptop client:
 - **Port 8000 bentrok**: jalankan `php artisan serve --port=8001` lalu akses http://localhost:8001.
 - **DB Connection refused**: pastikan MySQL di XAMPP aktif; cek host/port/user/password di `.env`.
 - **Migration gagal karena tabel sudah ada**: kosongkan DB (drop tables) lalu `php artisan migrate --seed` ulang.
-- **Ext php_intl/openssl/gd missing**: aktifkan di `php.ini`, restart Apache, lalu ulangi `composer install`.
+- **Ext php_gd/zip/intl/openssl missing**: aktifkan di `php.ini`, restart Apache, lalu ulangi `composer install`.
 - **Email gagal (reports/email)**: set `MAIL_MAILER=log` atau isi SMTP yang valid.
+- **Import Excel gagal**: pastikan extension `gd` dan `zip` sudah aktif di php.ini.
+- **Export Excel error**: clear cache dengan `php artisan cache:clear && php artisan config:clear`.
+- **Pagination icon terlalu besar**: sudah diperbaiki dengan Bootstrap 5 pagination.
+- **Excel file not found saat seeder**: pastikan file ada di folder `docs/`.
 
 ## Ringkasan Perintah
-```
+```bash
 # Clone repo
-git clone <URL_REPO_GITHUB> toko-obat-ro-tua
+git clone https://github.com/jonasbanurea/aplikasi-apoteker.git toko-obat-ro-tua
 cd toko-obat-ro-tua
 
 # Setup
 copy .env.example .env
+# Edit .env: DB_DATABASE=toko_obat_ro_tua, dll
+
+# PENTING: Aktifkan extension di C:\xampp\php\php.ini
+# - extension=gd
+# - extension=zip
+# - extension=intl
+# - extension=openssl
+# Lalu restart Apache di XAMPP
+
+# Install dependencies
 composer install
+
+# Generate key & migrasi (termasuk import produk dari Excel)
 php artisan key:generate
 php artisan migrate --seed
 
@@ -117,8 +150,11 @@ php artisan migrate --seed
 npm install
 npm run build
 
-# Run
+# Run aplikasi
 php artisan serve
+
+# Akses: http://localhost:8000
+# Login: owner@rotua.test / password
 ```
 
 Selesai. Aplikasi siap dipakai di laptop Windows 10.
