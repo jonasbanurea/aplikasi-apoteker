@@ -48,6 +48,7 @@
                         <th>SKU</th>
                         <th>Nama Dagang</th>
                         <th>Nama Generik</th>
+                        <th>Lokasi Rak</th>
                         <th>Golongan</th>
                         <th class="text-center">Wajib Resep</th>
                         <th class="text-end">Harga Jual</th>
@@ -63,6 +64,13 @@
                             <td class="fw-semibold">{{ $product->sku }}</td>
                             <td>{{ $product->nama_dagang }}</td>
                             <td>{{ $product->nama_generik ?? '-' }}</td>
+                            <td>
+                                @if($product->lokasi_rak)
+                                    <span class="badge bg-secondary">{{ $product->lokasi_rak }}</span>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
                             <td><span class="badge bg-info text-dark">{{ $product->golongan }}</span></td>
                             <td class="text-center">
                                 @if($product->wajib_resep)
@@ -99,7 +107,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="text-center text-muted">Belum ada produk</td>
+                            <td colspan="11" class="text-center text-muted">Belum ada produk</td>
                         </tr>
                     @endforelse
                 </tbody>
