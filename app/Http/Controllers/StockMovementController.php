@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\StockMovementsExport;
 use App\Http\Requests\StockMovementRequest;
 use App\Models\Product;
 use App\Models\StockBatch;
 use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class StockMovementController extends Controller
 {
@@ -84,5 +86,16 @@ class StockMovementController extends Controller
         });
 
         return redirect()->route('stock-movements.index')->with('success', 'Mutasi stok berhasil dicatat.');
+    }
+
+    public function export(Request $request)
+    {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        $productId = $request->input('product_id');
+
+        $filename = 'stock-movements-' . date('Y-m-d') . '.xlsx';
+        
+        return Excel::download(new StockMovementsExport($startDate, $endDate, $productId), $filename);
     }
 }

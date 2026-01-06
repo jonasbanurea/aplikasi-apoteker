@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SalesExport;
 use App\Http\Requests\SaleStoreRequest;
 use App\Models\Product;
 use App\Models\Sale;
@@ -10,7 +11,9 @@ use App\Models\SaleItemBatch;
 use App\Models\StockMovement;
 use App\Services\FefoAllocatorService;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use RuntimeException;
 
 class SaleController extends Controller
@@ -21,13 +24,31 @@ class SaleController extends Controller
         $this->middleware('shift.open')->only(['create', 'store']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $sales = Sale::with('user')
-            ->latest('sale_date')
-            ->paginate(15);
+        $query = Sale::with('user')->latest('sale_date');
+
+        // Filter by date range
+        if ($request->filled('start_date')) {
+            $query->whereDate('transaction_date', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('transaction_date', '<=', $request->end_date);
+        }
+
+        $sales = $query->paginate(15);
 
         return view('sales.index', compact('sales'));
+    }
+
+    public function export(Request $request)
+    {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        $filename = 'sales-' . date('Y-m-d') . '.xlsx';
+        
+        return Excel::download(new SalesExport($startDate, $endDate), $filename);
     }
 
     public function create()

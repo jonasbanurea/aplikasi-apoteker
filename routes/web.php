@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/password', [PasswordController::class, 'update'])->name('profile.password.update');
 
     // Master Data - RBAC handled in controllers
+    Route::get('suppliers/export', [SupplierController::class, 'export'])->name('suppliers.export');
     Route::resource('suppliers', SupplierController::class)->except(['show']);
     Route::get('products/export', [ProductController::class, 'export'])->name('products.export');
     Route::resource('products', ProductController::class)->except(['show']);
@@ -59,10 +60,12 @@ Route::middleware('auth')->group(function () {
     Route::post('shifts/{shift}/close', [ShiftController::class, 'close'])->name('shifts.close');
 
     // POS Penjualan
+    Route::get('sales/export', [SaleController::class, 'export'])->name('sales.export');
     Route::get('sales/{sale}/print', [SaleController::class, 'print'])->name('sales.print');
     Route::resource('sales', SaleController::class)->only(['index', 'create', 'store', 'show']);
  
     // Pembelian / Penerimaan
+    Route::get('purchases/export', [PurchaseController::class, 'export'])->name('purchases.export');
     Route::resource('purchases', PurchaseController::class)->only(['index', 'create', 'store', 'show']);
 
     // Stok
@@ -71,6 +74,7 @@ Route::middleware('auth')->group(function () {
     Route::post('stock-batches', [StockBatchController::class, 'store'])->name('stock-batches.store');
 
     Route::get('stock-movements', [StockMovementController::class, 'index'])->name('stock-movements.index');
+    Route::get('stock-movements/export', [StockMovementController::class, 'export'])->name('stock-movements.export');
     Route::post('stock-movements', [StockMovementController::class, 'store'])->name('stock-movements.store');
 
     // Retur supplier

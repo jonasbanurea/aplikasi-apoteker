@@ -9,6 +9,9 @@
         <h4 class="mb-0">Kartu Stok</h4>
         <small class="text-muted">Mutasi masuk/keluar per produk & batch</small>
     </div>
+    <a href="{{ route('stock-movements.export', request()->query()) }}" class="btn btn-success">
+        <i class="bi bi-file-earmark-excel"></i> Export Excel
+    </a>
 </div>
 
 <div class="card mb-3">

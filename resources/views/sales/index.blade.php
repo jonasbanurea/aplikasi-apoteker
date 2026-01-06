@@ -9,9 +9,14 @@
         <h4 class="mb-0">Daftar Penjualan</h4>
         <small class="text-muted">Riwayat transaksi POS</small>
     </div>
-    <a href="{{ route('sales.create') }}" class="btn btn-primary">
-        <i class="bi bi-cart-plus"></i> Transaksi Baru
-    </a>
+    <div class="d-flex gap-2">
+        <a href="{{ route('sales.export') }}" class="btn btn-success">
+            <i class="bi bi-file-earmark-excel"></i> Export Excel
+        </a>
+        <a href="{{ route('sales.create') }}" class="btn btn-primary">
+            <i class="bi bi-cart-plus"></i> Transaksi Baru
+        </a>
+    </div>
 </div>
 
 <div class="card">

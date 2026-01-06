@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SuppliersExport;
 use App\Http\Requests\SupplierRequest;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SupplierController extends Controller
 {
@@ -69,5 +71,12 @@ class SupplierController extends Controller
         return redirect()
             ->route('suppliers.index')
             ->with('success', 'Supplier berhasil dihapus.');
+    }
+
+    public function export()
+    {
+        $filename = 'suppliers-' . date('Y-m-d') . '.xlsx';
+        
+        return Excel::download(new SuppliersExport(), $filename);
     }
 }

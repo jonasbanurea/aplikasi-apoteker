@@ -9,11 +9,16 @@
         <h4 class="mb-0">Daftar Supplier</h4>
         <small class="text-muted">Kelola data supplier untuk pembelian</small>
     </div>
-    @if(auth()->user()->hasAnyRole('owner', 'admin_gudang'))
-    <a href="{{ route('suppliers.create') }}" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Tambah Supplier
-    </a>
-    @endif
+    <div class="d-flex gap-2">
+        <a href="{{ route('suppliers.export') }}" class="btn btn-success">
+            <i class="bi bi-file-earmark-excel"></i> Export Excel
+        </a>
+        @if(auth()->user()->hasAnyRole('owner', 'admin_gudang'))
+        <a href="{{ route('suppliers.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Tambah Supplier
+        </a>
+        @endif
+    </div>
 </div>
 
 <div class="card">

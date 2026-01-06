@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PurchasesExport;
 use App\Http\Requests\PurchaseStoreRequest;
 use App\Models\Product;
 use App\Models\Purchase;
@@ -10,7 +11,9 @@ use App\Models\StockBatch;
 use App\Models\StockMovement;
 use App\Models\Supplier;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PurchaseController extends Controller
 {
@@ -148,5 +151,15 @@ class PurchaseController extends Controller
         $purchase->load('supplier', 'items.product');
 
         return view('purchases.show', compact('purchase'));
+    }
+
+    public function export(Request $request)
+    {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        $filename = 'purchases-' . date('Y-m-d') . '.xlsx';
+        
+        return Excel::download(new PurchasesExport($startDate, $endDate), $filename);
     }
 }
