@@ -15,10 +15,12 @@ class ProductFromExcelSeeder extends Seeder
      */
     public function run(): void
     {
-        $excelFile = database_path('../docs/NAMA -NAMA OBAT DI TOKO OBAT RO TUA.xlsx');
+        // Use the latest Excel file with all RAK sheets (A-G)
+        $excelFile = database_path('../docs/NAMA -NAMA OBAT DI TOKO OBAT RO TUA4.xlsx');
         
         if (!file_exists($excelFile)) {
             $this->command->error("Excel file not found: $excelFile");
+            $this->command->info("Please ensure 'NAMA -NAMA OBAT DI TOKO OBAT RO TUA4.xlsx' exists in docs/ folder");
             return;
         }
 

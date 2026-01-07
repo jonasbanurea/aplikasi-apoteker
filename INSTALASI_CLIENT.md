@@ -93,7 +93,16 @@ cd toko-obat
 
 1. Buka folder aplikasi: `C:\projects\toko-obat`
 2. Copy file `.env.example` menjadi `.env`
-3. Edit file `.env` dengan Notepad, ubah:
+3. **Buat folder storage** (PENTING!):
+   - Buka Command Prompt di folder aplikasi
+   - Jalankan:
+   ```bash
+   mkdir storage\framework\sessions
+   mkdir storage\framework\views
+   mkdir storage\framework\cache\data
+   mkdir storage\logs
+   ```
+4. Edit file `.env` dengan Notepad, ubah:
 
 ```env
 DB_CONNECTION=mysql
@@ -230,6 +239,16 @@ Atau edit `start_aplikasi.bat`, ubah `APP_PORT=8001`
 composer dump-autoload
 php artisan config:clear
 php artisan cache:clear
+```
+
+### Problem: "Failed to open stream: No such file or directory" (storage/framework/sessions)
+**Solusi:**
+```bash
+cd C:\projects\toko-obat
+mkdir storage\framework\sessions
+mkdir storage\framework\views
+mkdir storage\framework\cache\data
+mkdir storage\logs
 ```
 
 ### Problem: Seeder error "Excel file not found"

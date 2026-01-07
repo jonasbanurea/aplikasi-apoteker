@@ -7,8 +7,8 @@ REM Sesuaikan path berikut dengan lokasi instalasi Anda:
 REM Path ke folder aplikasi (sesuaikan dengan lokasi Anda)
 set APP_PATH=D:\PROJECT\APOTEKER\Aplikasi
 
-REM Path ke XAMPP Control (sesuaikan jika berbeda)
-set XAMPP_PATH=D:\xampp\xampp-control.exe
+REM Path ke folder XAMPP (sesuaikan jika berbeda)
+set XAMPP_DIR=D:\xampp
 
 REM Port aplikasi (default 8000, ubah jika bentrok)
 set APP_PORT=8000
@@ -29,21 +29,40 @@ echo.
 REM Pindah ke folder aplikasi
 cd /d %APP_PATH%
 
-echo [1/4] Starting XAMPP (Apache + MySQL)...
-start "" "%XAMPP_PATH%" --startapache --startmysql
+echo [1/5] Checking XAMPP services...
+REM Cek apakah Apache sudah jalan
+tasklist /FI "IMAGENAME eq httpd.exe" 2>NUL | find /I /N "httpd.exe">NUL
+if "%ERRORLEVEL%"=="0" (
+    echo Apache already running
+) else (
+    echo Starting Apache...
+    start "" "%XAMPP_DIR%\apache\bin\httpd.exe"
+)
 
-echo [2/4] Waiting for MySQL to be ready (10 seconds)...
+REM Cek apakah MySQL sudah jalan
+tasklist /FI "IMAGENAME eq mysqld.exe" 2>NUL | find /I /N "mysqld.exe">NUL
+if "%ERRORLEVEL%"=="0" (
+    echo MySQL already running
+) else (
+    echo Starting MySQL...
+    start "" "%XAMPP_DIR%\mysql\bin\mysqld.exe" --defaults-file="%XAMPP_DIR%\mysql\bin\my.ini"
+)
+
+echo [2/5] Waiting for services to be ready (10 seconds)...
 timeout /t 10 /nobreak >nul
 
-echo [3/4] Starting Laravel server on port %APP_PORT%...
+echo [3/5] Starting Laravel server on port %APP_PORT%...
 start "" cmd /c "php artisan serve --host=0.0.0.0 --port=%APP_PORT%"
 
-echo [4/4] Opening browser in kiosk mode...
-timeout /t 3 /nobreak >nul
+echo [4/5] Waiting for Laravel server (5 seconds)...
+timeout /t 5 /nobreak >nul
+
+echo [5/5] Opening browser...
+timeout /t 2 /nobreak >nul
 if "%BROWSER%"=="chrome" (
-    start "" chrome --kiosk http://localhost:%APP_PORT%
+    start "" chrome http://localhost:%APP_PORT%
 ) else (
-    start "" msedge --kiosk http://localhost:%APP_PORT% --edge-kiosk-type=fullscreen
+    start "" msedge http://localhost:%APP_PORT%
 )
 
 echo.
