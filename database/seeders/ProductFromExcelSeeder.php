@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Product;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
@@ -15,6 +16,10 @@ class ProductFromExcelSeeder extends Seeder
      */
     public function run(): void
     {
+        // Increase execution time and memory limit for large Excel imports
+        set_time_limit(300); // 5 minutes
+        ini_set('memory_limit', '512M');
+        
         // Use the latest Excel file with all RAK sheets (A-G)
         $excelFile = database_path('../docs/NAMA -NAMA OBAT DI TOKO OBAT RO TUA4.xlsx');
         
@@ -33,14 +38,27 @@ class ProductFromExcelSeeder extends Seeder
             $totalImported = 0;
             $totalSkipped = 0;
             
+            // Get the highest SKU number from existing products
+            $lastProduct = Product::where('sku', 'like', 'OBT%')
+                ->orderBy('sku', 'desc')
+                ->first();
+            
+            if ($lastProduct) {
+                // Extract number from SKU (e.g., OBT01175 -> 1175)
+                $lastSku = (int) substr($lastProduct->sku, 3);
+                $skuCounter = $lastSku + 1;
+                $this->command->info("Starting SKU from: OBT" . str_pad($skuCounter, 5, '0', STR_PAD_LEFT) . " (continuing from existing products)");
+            } else {
+                $skuCounter = 1000;
+                $this->command->info("Starting SKU from: OBT01000 (no existing products)");
+            }
+            
             // Loop through all sheets (RAK A, RAK B, RAK D)
             foreach ($spreadsheet->getWorksheetIterator() as $worksheet) {
                 $sheetName = $worksheet->getTitle();
                 $highestRow = $worksheet->getHighestRow();
                 
                 $this->command->info("\n=== Processing Sheet: {$sheetName} ({$highestRow} rows) ===");
-                
-                $skuCounter = 1000 + $totalImported; // Continue SKU numbering
                 
                 // Start from row 2 (skip header)
                 for ($row = 2; $row <= $highestRow; $row++) {
@@ -74,10 +92,17 @@ class ProductFromExcelSeeder extends Seeder
                     // Map sediaan to bentuk
                     $bentuk = $this->mapSediaanToBentuk($sediaan);
                     
-                    // Generate SKU
-                    $sku = 'OBT' . str_pad($skuCounter++, 5, '0', STR_PAD_LEFT);
+                    // Generate SKU - ensure uniqueness
+                    $sku = 'OBT' . str_pad($skuCounter, 5, '0', STR_PAD_LEFT);
                     
-                    // Check if product already exists
+                    // Double check SKU doesn't exist (safety check)
+                    while (Product::where('sku', $sku)->exists()) {
+                        $skuCounter++;
+                        $sku = 'OBT' . str_pad($skuCounter, 5, '0', STR_PAD_LEFT);
+                    }
+                    $skuCounter++; // Increment for next product
+                    
+                    // Check if product already exists by name
                     $existingProduct = Product::where('nama_dagang', $namaBarang)->first();
                     
                     if ($existingProduct) {
@@ -86,13 +111,17 @@ class ProductFromExcelSeeder extends Seeder
                         continue;
                     }
                     
-                    // Create product
-                    $product = Product::create([
-                        'sku' => $sku,
-                        'nama_dagang' => $namaBarang,
-                        'nama_generik' => $namaBarang, // Use nama_dagang as default
-                        'bentuk' => $bentuk,
-                        'kekuatan_dosis' => '-', // Not in Excel
+                    // Use transaction for data integrity
+                    try {
+                        DB::beginTransaction();
+                        
+                        // Create product
+                        $product = Product::create([
+                            'sku' => $sku,
+                            'nama_dagang' => $namaBarang,
+                            'nama_generik' => $namaBarang, // Use nama_dagang as default
+                            'bentuk' => $bentuk,
+                            'kekuatan_dosis' => '-', // Not in Excel
                         'satuan' => $sediaan,
                         'golongan' => $golongan,
                         'wajib_resep' => in_array($golongan, ['PSIKOTROPIKA', 'NARKOTIKA']),
@@ -137,8 +166,17 @@ class ProductFromExcelSeeder extends Seeder
                         ]);
                     }
                     
+                    DB::commit();
+                    
                     $this->command->info("  ✓ {$namaBarang} (SKU: {$sku}, Lokasi: {$lokBarang}, Stock: {$stok})");
                     $totalImported++;
+                    
+                    } catch (\Exception $e) {
+                        DB::rollBack();
+                        $this->command->error("  ✗ Error importing {$namaBarang}: " . $e->getMessage());
+                        // Continue with next product instead of stopping
+                        continue;
+                    }
                 }
                 
                 $this->command->info("Sheet {$sheetName} completed!");
