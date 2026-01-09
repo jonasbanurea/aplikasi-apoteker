@@ -64,6 +64,7 @@ config/stock.php, reports.php, mail.php
 - Import dari Excel: File Excel harus disimpan di folder `docs/` dengan format kolom yang sesuai (NO, NAMA BARANG, SEDIAAN, LOK BARANG, STOK, KATEGORI, HRG BELI, MARGIN, HRG JUAL, EXP DATE)
 - Export ke Excel: Klik tombol "Export Excel" di halaman Produk untuk mengunduh daftar produk terbaru
 - File contoh: `docs/NAMA -NAMA OBAT DI TOKO OBAT RO TUA.xlsx`
+- **Panduan penamaan SKU**: Lihat [PANDUAN_SKU_PRODUK.md](docs/PANDUAN_SKU_PRODUK.md) untuk format dan contoh penamaan SKU yang benar
 
 ## Troubleshooting Ringkas
 - DB unknown: pastikan DB dibuat dan .env sesuai.

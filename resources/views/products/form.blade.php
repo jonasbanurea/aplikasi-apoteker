@@ -4,8 +4,9 @@
 
 <div class="row g-3">
     <div class="col-md-4">
-        <label class="form-label">SKU</label>
-        <input type="text" name="sku" class="form-control @error('sku') is-invalid @enderror" value="{{ old('sku', $product->sku) }}" required>
+        <label class="form-label">SKU <small class="text-muted">(Kode Unik Produk)</small></label>
+        <input type="text" name="sku" class="form-control @error('sku') is-invalid @enderror" value="{{ old('sku', $product->sku) }}" required placeholder="Contoh: OBT-0001, SRP-0001">
+        <small class="text-muted">Format: OBT-0001 (Tablet), SRP-0001 (Sirup), TOP-0001 (Salep), ALK-0001 (Alkes)</small>
         @error('sku')<div class="invalid-feedback">{{ $message }}</div>@enderror
     </div>
     <div class="col-md-4">

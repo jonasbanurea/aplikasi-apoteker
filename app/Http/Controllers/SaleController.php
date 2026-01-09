@@ -90,7 +90,7 @@ class SaleController extends Controller
                         'net_price' => $netPrice,
                         'line_total' => $netPrice * $qty,
                     ];
-                });
+                })->values();
 
                 $discountTotal = isset($data['discount_total']) ? (float) $data['discount_total'] : 0;
                 $subtotal = $itemsPayload->sum('line_total');
@@ -182,6 +182,96 @@ class SaleController extends Controller
         $sale->load(['user', 'items.product', 'items.batches.stockBatch']);
 
         return view('sales.print', compact('sale'));
+    }
+
+    public function printThermal(Sale $sale)
+    {
+        $sale->load(['user', 'items.product', 'items.batches.stockBatch']);
+
+        // Generate ESC/POS raw data
+        $escpos = $this->generateEscPosReceipt($sale);
+
+        // Return as downloadable text file yang bisa dikirim langsung ke printer
+        return response($escpos)
+            ->header('Content-Type', 'text/plain')
+            ->header('Content-Disposition', 'attachment; filename="struk-' . $sale->invoice_no . '.txt"');
+    }
+
+    protected function generateEscPosReceipt(Sale $sale): string
+    {
+        $output = '';
+        
+        // ESC/POS Commands
+        $ESC = "\x1B";
+        $GS = "\x1D";
+        
+        // Initialize printer
+        $output .= $ESC . "@"; // Initialize
+        
+        // Center align + Bold + Store name
+        $output .= $ESC . "a" . chr(1); // Center
+        $output .= $ESC . "E" . chr(1); // Bold ON
+        $output .= config('app.name') . "\n";
+        $output .= $ESC . "E" . chr(0); // Bold OFF
+        
+        // Invoice info
+        $output .= "Invoice: " . $sale->invoice_no . "\n";
+        $output .= "Kasir: " . ($sale->user?->name ?? '-') . "\n";
+        $output .= $sale->sale_date?->format('d/m/Y H:i') . "\n";
+        
+        // Separator line
+        $output .= $ESC . "a" . chr(0); // Left align
+        $output .= str_repeat("-", 32) . "\n";
+        
+        // Items
+        foreach ($sale->items as $item) {
+            $productName = $item->product->nama_dagang ?? '-';
+            // Truncate if too long
+            if (strlen($productName) > 32) {
+                $productName = substr($productName, 0, 29) . '...';
+            }
+            $output .= $productName . "\n";
+            
+            $qty = $item->qty;
+            $price = number_format($item->price - $item->discount, 0, ',', '.');
+            $lineTotal = number_format($item->line_total, 0, ',', '.');
+            
+            $qtyPrice = $qty . "x" . $price;
+            $spaces = 32 - strlen($qtyPrice) - strlen($lineTotal);
+            $output .= $qtyPrice . str_repeat(' ', $spaces) . $lineTotal . "\n";
+        }
+        
+        // Separator
+        $output .= str_repeat("-", 32) . "\n";
+        
+        // Totals
+        $total = "TOTAL";
+        $totalAmount = number_format($sale->total, 0, ',', '.');
+        $spaces = 32 - strlen($total) - strlen($totalAmount);
+        $output .= $ESC . "E" . chr(1); // Bold ON
+        $output .= $total . str_repeat(' ', $spaces) . $totalAmount . "\n";
+        $output .= $ESC . "E" . chr(0); // Bold OFF
+        
+        $paid = "Bayar(" . $sale->payment_method . ")";
+        $paidAmount = number_format($sale->paid_amount, 0, ',', '.');
+        $spaces = 32 - strlen($paid) - strlen($paidAmount);
+        $output .= $paid . str_repeat(' ', $spaces) . $paidAmount . "\n";
+        
+        $change = "Kembali";
+        $changeAmount = number_format($sale->change_amount, 0, ',', '.');
+        $spaces = 32 - strlen($change) - strlen($changeAmount);
+        $output .= $change . str_repeat(' ', $spaces) . $changeAmount . "\n";
+        
+        // Footer
+        $output .= str_repeat("-", 32) . "\n";
+        $output .= $ESC . "a" . chr(1); // Center
+        $output .= "Terima Kasih\n";
+        
+        // Feed and cut
+        $output .= "\n\n\n";
+        $output .= $GS . "V" . chr(1); // Partial cut
+        
+        return $output;
     }
 
     protected function generateInvoiceNo(): string

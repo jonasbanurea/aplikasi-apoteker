@@ -62,6 +62,7 @@ Route::middleware('auth')->group(function () {
     // POS Penjualan
     Route::get('sales/export', [SaleController::class, 'export'])->name('sales.export');
     Route::get('sales/{sale}/print', [SaleController::class, 'print'])->name('sales.print');
+    Route::get('sales/{sale}/print-thermal', [SaleController::class, 'printThermal'])->name('sales.print-thermal');
     Route::resource('sales', SaleController::class)->only(['index', 'create', 'store', 'show']);
  
     // Pembelian / Penerimaan

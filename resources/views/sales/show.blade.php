@@ -10,8 +10,15 @@
         <small class="text-muted">{{ $sale->sale_date?->format('d M Y H:i') }}</small>
     </div>
     <div>
-        <a href="{{ route('sales.print', $sale) }}" class="btn btn-outline-primary" target="_blank"><i class="bi bi-printer"></i> Cetak Struk</a>
-        <a href="{{ route('sales.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Kembali</a>
+        <a href="{{ route('sales.print', $sale) }}" class="btn btn-outline-primary" target="_blank">
+            <i class="bi bi-printer"></i> Cetak HTML
+        </a>
+        <a href="{{ route('sales.print-thermal', $sale) }}" class="btn btn-primary" download>
+            <i class="bi bi-receipt"></i> Print Thermal 58mm
+        </a>
+        <a href="{{ route('sales.index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Kembali
+        </a>
     </div>
 </div>
 
