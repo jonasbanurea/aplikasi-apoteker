@@ -143,6 +143,7 @@ start_with_ngrok.bat
 - `test_network.bat` - Test koneksi jaringan dan verifikasi setup
 - `cek_mysql_status.bat` - Diagnosa status MySQL dan koneksi database
 - `update_produk.bat` - Update data produk dari Excel dengan backup otomatis
+- `update_aplikasi.bat` - Update aplikasi dari GitHub (untuk customer) ⭐ NEW
 
 ### Utilities
 - `download_ngrok.bat` - Download Ngrok untuk akses internet
@@ -157,6 +158,32 @@ start_with_ngrok.bat
 - 🎯 **`DECISION_TREE_AKSES.md`** - Decision tree untuk memilih metode akses yang tepat
 - ❓ **`FAQ_AKSES_INTERNET.md`** - Frequently Asked Questions tentang akses internet
 - 🔒 **`SECURITY_CHECKLIST.md`** - Checklist keamanan untuk akses internet
+
+### Dokumentasi Update & Maintenance
+- 🔄 **`PANDUAN_UPDATE_CUSTOMER.md`** - Panduan update aplikasi untuk customer ⭐ NEW
+- 📝 **`CARA_UPDATE_DARI_GITHUB.md`** - Panduan update lengkap dari GitHub
+- ✏️ **`CARA_EDIT_EXPIRED_DATE.md`** - Cara edit tanggal expired obat ⭐ NEW
+
+## 🆕 Update Terbaru (11 Januari 2026)
+
+### Fitur Baru:
+- ✅ **Edit Stock Batch**: Edit expired date, qty, cost price langsung
+- ✅ **Filter Stock Batch**: Filter per produk dan mendekati expired
+- ✅ **Update Script**: Script otomatis update aplikasi dari GitHub
+
+### Cara Update Aplikasi:
+```bash
+# Cara termudah (double-click):
+update_aplikasi.bat
+
+# Atau manual:
+cd C:\projects\toko-obat
+git pull origin main
+php artisan config:clear
+php artisan cache:clear
+```
+
+**Detail lengkap:** Lihat [PANDUAN_UPDATE_CUSTOMER.md](docs/PANDUAN_UPDATE_CUSTOMER.md)
 
 ## Lisensi
 Aplikasi internal Toko Obat Ro Tua.

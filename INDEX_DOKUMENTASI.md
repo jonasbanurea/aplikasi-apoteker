@@ -133,9 +133,36 @@
     - Contoh penamaan
     - Best practices
 
+15. **[UPDATE_DATA_PRODUK.md](docs/UPDATE_DATA_PRODUK.md)**
+    - Update data produk dari Excel
+    - Script helper untuk update
+    - Troubleshooting update
+
+### 🔄 Update & Maintenance
+
+16. **[PANDUAN_UPDATE_CUSTOMER.md](docs/PANDUAN_UPDATE_CUSTOMER.md)** ⭐ CUSTOMER
+    - Cara update aplikasi untuk customer
+    - Update via Git Pull (termudah)
+    - Update manual (download ZIP)
+    - Checklist update
+    - **Use Case**: Update aplikasi setelah ada fitur baru
+
+17. **[CARA_UPDATE_DARI_GITHUB.md](docs/CARA_UPDATE_DARI_GITHUB.md)** ⭐ LENGKAP
+    - Update via Git (detailed)
+    - Download manual via browser
+    - Update file Excel saja
+    - Verifikasi update berhasil
+    - **Use Case**: Developer & IT Admin
+
+18. **[CARA_EDIT_EXPIRED_DATE.md](docs/CARA_EDIT_EXPIRED_DATE.md)**
+    - Edit tanggal expired obat
+    - Edit via Stock Batch (recommended)
+    - Edit via Purchase
+    - **Use Case**: Koreksi data expired
+
 ### 👥 User Guides
 
-15. **[user-guide.md](docs/user-guide.md)**
+19. **[user-guide.md](docs/user-guide.md)**
     - Panduan untuk kasir
     - Panduan untuk admin gudang
     - Panduan untuk owner
@@ -170,6 +197,7 @@ cek_mysql_status.bat      - Diagnosa MySQL & database
 download_ngrok.bat        - Download Ngrok otomatis
 generate_qr_code.bat      - Generate QR Code untuk akses mudah
 update_produk.bat         - Update data produk dari Excel
+update_aplikasi.bat       - Update aplikasi dari GitHub [CUSTOMER]
 ```
 
 ---
@@ -199,6 +227,15 @@ update_produk.bat         - Update data produk dari Excel
 3. Setup authtoken di ngrok.com
 4. Jalankan: start_with_ngrok.bat
 5. Share URL yang muncul
+```
+
+### Scenario 4: Update Aplikasi (Ada Fitur Baru)
+```
+1. Baca: PANDUAN_UPDATE_CUSTOMER.md
+2. Backup: Database & file .env
+3. Update: Jalankan update_aplikasi.bat
+4. Test: Login & cek fitur baru
+5. Dokumentasi: Baca CHANGELOG untuk fitur baru
 ```
 
 ### Scenario 4: Buka Cabang Baru di Kota Lain
@@ -359,6 +396,9 @@ notepad storage\logs\laravel.log
 
 ## 🔄 Update History
 
+- **11 Jan 2026**: Added update documentation & script (update_aplikasi.bat)
+- **11 Jan 2026**: Added stock batch edit feature
+- **8 Jan 2026**: Added export features & Excel import
 - **Jan 2026**: Initial documentation (akses lokal + internet)
 - **Jan 2026**: Added security checklist
 - **Jan 2026**: Added FAQ & decision tree
