@@ -338,16 +338,52 @@
             @endhasanyrole
 
             @hasanyrole('owner|admin_gudang|kasir')
-            @php $hasReports = Route::has('reports.index'); @endphp
-            @if($hasReports)
+            @php 
+                $hasReports = Route::has('reports.index');
+                $hasSales = Route::has('sales.index');
+                $hasPurchases = Route::has('purchases.index');
+                $hasStockMovements = Route::has('stock-movements.index');
+                $hasProducts = Route::has('products.index');
+            @endphp
+            @if($hasReports || $hasSales || $hasPurchases)
             <li class="nav-item mt-3">
                 <small class="text-muted px-3">LAPORAN</small>
             </li>
+            @if($hasReports)
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}">
-                    <i class="bi bi-graph-up"></i> Laporan
+                <a class="nav-link {{ request()->routeIs('reports.index') ? 'active' : '' }}" href="{{ route('reports.index') }}">
+                    <i class="bi bi-graph-up"></i> Dashboard Laporan
                 </a>
             </li>
+            @endif
+            @if($hasSales)
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('sales.index') }}">
+                    <i class="bi bi-cart-check"></i> Laporan Penjualan
+                </a>
+            </li>
+            @endif
+            @if($hasPurchases)
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('purchases.index') }}">
+                    <i class="bi bi-receipt-cutoff"></i> Laporan Pembelian
+                </a>
+            </li>
+            @endif
+            @if($hasStockMovements)
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('stock-movements.index') }}">
+                    <i class="bi bi-box-seam"></i> Laporan Stok
+                </a>
+            </li>
+            @endif
+            @if($hasProducts)
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('products.index') }}">
+                    <i class="bi bi-currency-dollar"></i> Laporan Nilai Stok
+                </a>
+            </li>
+            @endif
             @endif
             @endhasanyrole
             
