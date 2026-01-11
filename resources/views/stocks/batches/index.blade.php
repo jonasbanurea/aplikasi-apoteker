@@ -84,8 +84,13 @@
                             <td>Rp {{ number_format($batch->cost_price, 2, ',', '.') }}</td>
                             <td>{{ $batch->received_at ? $batch->received_at->format('d M Y') : '-' }}</td>
                             <td>
-                                <a href="{{ route('stock-movements.index', ['product_id' => $batch->product_id, 'batch_id' => $batch->id]) }}" class="btn btn-sm btn-outline-secondary">
-                                    <i class="bi bi-arrow-left-right"></i> Kartu Stok
+                                @if(auth()->user()->hasAnyRole('owner', 'admin_gudang'))
+                                <a href="{{ route('stock-batches.edit', $batch) }}" class="btn btn-sm btn-outline-primary me-1" title="Edit Batch">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                @endif
+                                <a href="{{ route('stock-movements.index', ['product_id' => $batch->product_id, 'batch_id' => $batch->id]) }}" class="btn btn-sm btn-outline-secondary" title="Kartu Stok">
+                                    <i class="bi bi-arrow-left-right"></i>
                                 </a>
                             </td>
                         </tr>

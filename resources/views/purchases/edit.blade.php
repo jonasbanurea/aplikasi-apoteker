@@ -63,7 +63,7 @@
                             <th style="width: 13%">Expired</th>
                             <th style="width: 10%" class="text-end">Qty</th>
                             <th style="width: 10%" class="text-end">Bonus</th>
-                            <th style="width: 15%" class="text-end">Harga Beli</th>
+                            <th style="width: 15%" class="text-end">Harga Beli/item</th>
                             <th style="width: 7%"></th>
                         </tr>
                     </thead>

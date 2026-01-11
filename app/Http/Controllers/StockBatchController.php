@@ -51,4 +51,19 @@ class StockBatchController extends Controller
 
         return redirect()->route('stock-batches.index')->with('success', 'Batch stok berhasil ditambahkan.');
     }
+
+    public function edit(StockBatch $stockBatch)
+    {
+        $products = Product::orderBy('nama_dagang')->get(['id', 'nama_dagang', 'sku']);
+        $batch = $stockBatch;
+
+        return view('stocks.batches.edit', compact('products', 'batch'));
+    }
+
+    public function update(StockBatchRequest $request, StockBatch $stockBatch)
+    {
+        $stockBatch->update($request->validated());
+
+        return redirect()->route('stock-batches.index')->with('success', 'Batch stok berhasil diupdate.');
+    }
 }

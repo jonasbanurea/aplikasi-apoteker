@@ -73,6 +73,8 @@ Route::middleware('auth')->group(function () {
     Route::get('stock-batches', [StockBatchController::class, 'index'])->name('stock-batches.index');
     Route::get('stock-batches/create', [StockBatchController::class, 'create'])->name('stock-batches.create');
     Route::post('stock-batches', [StockBatchController::class, 'store'])->name('stock-batches.store');
+    Route::get('stock-batches/{stock_batch}/edit', [StockBatchController::class, 'edit'])->name('stock-batches.edit');
+    Route::put('stock-batches/{stock_batch}', [StockBatchController::class, 'update'])->name('stock-batches.update');
 
     Route::get('stock-movements', [StockMovementController::class, 'index'])->name('stock-movements.index');
     Route::get('stock-movements/export', [StockMovementController::class, 'export'])->name('stock-movements.export');
