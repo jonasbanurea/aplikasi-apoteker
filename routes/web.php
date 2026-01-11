@@ -67,7 +67,7 @@ Route::middleware('auth')->group(function () {
  
     // Pembelian / Penerimaan
     Route::get('purchases/export', [PurchaseController::class, 'export'])->name('purchases.export');
-    Route::resource('purchases', PurchaseController::class)->only(['index', 'create', 'store', 'show']);
+    Route::resource('purchases', PurchaseController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update']);
 
     // Stok
     Route::get('stock-batches', [StockBatchController::class, 'index'])->name('stock-batches.index');

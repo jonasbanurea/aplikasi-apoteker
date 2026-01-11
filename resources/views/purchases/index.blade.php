@@ -64,9 +64,16 @@
                                 @endif
                             </td>
                             <td>
-                                <a href="{{ route('purchases.show', $purchase) }}" class="btn btn-sm btn-outline-secondary">
-                                    <i class="bi bi-eye"></i> Detail
-                                </a>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ route('purchases.show', $purchase) }}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-eye"></i> Detail
+                                    </a>
+                                    @if(auth()->user()->hasAnyRole('owner', 'admin_gudang'))
+                                    <a href="{{ route('purchases.edit', $purchase) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty

@@ -6,6 +6,8 @@
 
 Aplikasi manajemen apotek dengan RBAC (Owner, Kasir, Admin Gudang), POS FEFO, pembelian, stok, laporan, dan backup.
 
+**📚 [INDEX_DOKUMENTASI.md](INDEX_DOKUMENTASI.md)** - Panduan navigasi lengkap semua dokumentasi
+
 ## Fitur Utama
 - Autentikasi & RBAC (Spatie Permission), proteksi user non-aktif
 - Dashboard per role dengan grafik, top produk, alert stok/expired
@@ -49,6 +51,57 @@ routes/web.php (RBAC, backup owner-only)
 config/stock.php, reports.php, mail.php
 ```
 
+## Akses Aplikasi dari Device Lain
+
+### 📱 Akses Lokal (WiFi - Recommended untuk Operasional)
+
+**Untuk akses dari HP/Tablet dalam toko (WiFi sama):**
+
+Ikuti panduan lengkap di [PANDUAN_AKSES_JARINGAN.md](PANDUAN_AKSES_JARINGAN.md) yang mencakup:
+1. ✅ Set IP Static di Windows 11
+2. ✅ Konfigurasi Firewall (script otomatis tersedia)
+3. ✅ Cara akses dari device lain
+4. ✅ Troubleshooting koneksi
+
+**Quick Start:**
+```bash
+# 1. Setup lengkap (Run as Administrator)
+setup_network_full.bat
+
+# 2. Jalankan aplikasi
+start_aplikasi.bat
+
+# 3. Akses dari HP/tablet - gunakan URL yang ditampilkan
+# Contoh: http://192.168.1.100:8000
+```
+
+### 🌐 Akses Internet (Dari Mana Saja - Optional)
+
+**Untuk akses dari luar toko (owner monitoring dari rumah):**
+
+Lihat [PANDUAN_AKSES_INTERNET.md](PANDUAN_AKSES_INTERNET.md) untuk berbagai opsi:
+1. 🚀 **Ngrok** - Termudah untuk demo/testing (5 menit setup)
+2. ☁️ **Cloudflare Tunnel** - Gratis & aman untuk production
+3. 🔐 **VPN** - Paling aman untuk owner
+4. 🌍 **Cloud Hosting** - Production grade dengan biaya bulanan
+
+**Quick Start Ngrok:**
+```bash
+# 1. Download & install
+download_ngrok.bat
+
+# 2. Daftar & dapatkan authtoken di ngrok.com
+# 3. Setup authtoken
+ngrok.exe config add-authtoken YOUR_TOKEN
+
+# 4. Jalankan dengan Ngrok
+start_with_ngrok.bat
+```
+
+**Perbandingan:** Lihat [PERBANDINGAN_AKSES.md](PERBANDINGAN_AKSES.md) untuk memilih metode yang tepat.
+
+---
+
 ## Backup (Owner Menu)
 - Menu: Owner → Backup
 - Hasil: ZIP berisi database.sql + public + storage/app/public ke Documents (default)
@@ -74,10 +127,36 @@ config/stock.php, reports.php, mail.php
 - Login ditolak: user mungkin non-aktif (`is_active=false`).
 
 ## Utilitas Helper (Batch Scripts)
-- `start_aplikasi.bat` - Start aplikasi dengan satu klik
+
+### Setup & Konfigurasi
+- `setup_network_full.bat` - **[RUN AS ADMIN]** Setup lengkap firewall + power management untuk akses lokal
+- `setup_firewall.bat` - **[RUN AS ADMIN]** Setup firewall Windows untuk akses dari device lain
+- `setup_power.bat` - **[RUN AS ADMIN]** Konfigurasi power management (laptop tidak sleep)
+- `setup.bat` - Setup awal aplikasi (install dependencies, migrate, seed)
+
+### Jalankan Aplikasi
+- `start_aplikasi.bat` - Start aplikasi dengan satu klik (sudah support akses jaringan)
 - `start_mysql_and_app.bat` - Auto-start MySQL dan aplikasi
+- `start_with_ngrok.bat` - Start aplikasi dengan Ngrok (akses dari internet)
+
+### Testing & Maintenance
+- `test_network.bat` - Test koneksi jaringan dan verifikasi setup
 - `cek_mysql_status.bat` - Diagnosa status MySQL dan koneksi database
 - `update_produk.bat` - Update data produk dari Excel dengan backup otomatis
+
+### Utilities
+- `download_ngrok.bat` - Download Ngrok untuk akses internet
+- `generate_qr_code.bat` - Generate instruksi QR Code untuk akses mudah
+
+### Dokumentasi Akses
+- 📘 **`PANDUAN_AKSES_JARINGAN.md`** - Panduan lengkap akses dari device lain (lokal/WiFi)
+- 🌐 **`PANDUAN_AKSES_INTERNET.md`** - Panduan lengkap akses dari internet (luar jaringan)
+- 📊 **`DIAGRAM_AKSES_JARINGAN.md`** - Diagram dan flow chart arsitektur jaringan
+- 📱 **`QUICK_REF_AKSES_JARINGAN.md`** - Quick reference card untuk kasir/staff
+- 🔄 **`PERBANDINGAN_AKSES.md`** - Perbandingan metode akses lokal vs internet
+- 🎯 **`DECISION_TREE_AKSES.md`** - Decision tree untuk memilih metode akses yang tepat
+- ❓ **`FAQ_AKSES_INTERNET.md`** - Frequently Asked Questions tentang akses internet
+- 🔒 **`SECURITY_CHECKLIST.md`** - Checklist keamanan untuk akses internet
 
 ## Lisensi
 Aplikasi internal Toko Obat Ro Tua.

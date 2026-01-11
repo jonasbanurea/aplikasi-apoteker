@@ -84,38 +84,54 @@
                 <table class="table table-bordered align-middle" id="itemsTable">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 30%">Produk</th>
-                            <th style="width: 10%" class="text-end">Qty</th>
-                            <th style="width: 15%" class="text-end">Harga</th>
-                            <th style="width: 15%" class="text-end">Diskon/Unit</th>
-                            <th style="width: 15%" class="text-end">Subtotal</th>
-                            <th style="width: 7%"></th>
+                            <th style="width: 25%">Produk</th>
+                            <th style="width: 12%">Unit</th>
+                            <th style="width: 8%" class="text-end">Qty</th>
+                            <th style="width: 13%" class="text-end">Harga</th>
+                            <th style="width: 13%" class="text-end">Diskon/Unit</th>
+                            <th style="width: 13%" class="text-end">Subtotal</th>
+                            <th style="width: 5%"></th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($oldItems as $index => $item)
                         <tr>
                             <td>
-                                <select name="items[{{ $index }}][product_id]" class="form-select product-select" required>
+                                <select name="items[{{ $index }}][product_id]" class="form-select product-select" required data-row="{{ $index }}">
                                     <option value="" disabled {{ empty($item['product_id']) ? 'selected' : '' }}>Pilih produk</option>
                                     @foreach($products as $product)
-                                        <option value="{{ $product->id }}" data-price="{{ $product->harga_jual }}" {{ $item['product_id'] == $product->id ? 'selected' : '' }}>
+                                        <option value="{{ $product->id }}" 
+                                                data-price="{{ $product->harga_jual }}"
+                                                data-jual-eceran="{{ $product->jual_eceran ? 1 : 0 }}"
+                                                data-harga-eceran="{{ $product->harga_eceran ?? 0 }}"
+                                                data-unit-kemasan="{{ $product->unit_kemasan }}"
+                                                data-unit-terkecil="{{ $product->unit_terkecil }}"
+                                                data-isi-per-kemasan="{{ $product->isi_per_kemasan }}"
+                                                {{ $item['product_id'] == $product->id ? 'selected' : '' }}>
                                             {{ $product->sku }} - {{ $product->nama_dagang }}
+                                            @if($product->jual_eceran)
+                                                ({{ $product->unit_kemasan }} / {{ $product->unit_terkecil }})
+                                            @endif
                                         </option>
                                     @endforeach
                                 </select>
                             </td>
-                            <td><input type="number" name="items[{{ $index }}][qty]" class="form-control text-end qty-input" min="1" value="{{ $item['qty'] }}" required></td>
+                            <td>
+                                <select name="items[{{ $index }}][unit]" class="form-select unit-select" required data-row="{{ $index }}">
+                                    <option value="kemasan" selected>Kemasan</option>
+                                </select>
+                            </td>
+                            <td><input type="number" name="items[{{ $index }}][qty]" class="form-control text-end qty-input" min="1" value="{{ $item['qty'] }}" required data-row="{{ $index }}"></td>
                             <td>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="number" step="0.01" min="0" name="items[{{ $index }}][price]" class="form-control text-end price-input" value="{{ $item['price'] }}" required>
+                                    <input type="number" step="0.01" min="0" name="items[{{ $index }}][price]" class="form-control text-end price-input" value="{{ $item['price'] }}" required data-row="{{ $index }}">
                                 </div>
                             </td>
                             <td>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
-                                    <input type="number" step="0.01" min="0" name="items[{{ $index }}][discount]" class="form-control text-end discount-input" value="{{ $item['discount'] ?? 0 }}">
+                                    <input type="number" step="0.01" min="0" name="items[{{ $index }}][discount]" class="form-control text-end discount-input" value="{{ $item['discount'] ?? 0 }}" data-row="{{ $index }}">
                                 </div>
                             </td>
                             <td class="text-end line-total">0</td>
@@ -179,6 +195,11 @@
             'id' => $p->id,
             'label' => $p->sku . ' - ' . $p->nama_dagang,
             'price' => (float) $p->harga_jual,
+            'jual_eceran' => (bool) $p->jual_eceran,
+            'harga_eceran' => (float) ($p->harga_eceran ?? 0),
+            'unit_kemasan' => $p->unit_kemasan ?? 'Kemasan',
+            'unit_terkecil' => $p->unit_terkecil ?? 'Unit',
+            'isi_per_kemasan' => (int) ($p->isi_per_kemasan ?? 1),
         ])
         ->values()
         ->toJson();
@@ -197,6 +218,52 @@
 
     function formatRupiah(value) {
         return 'Rp ' + Number(value || 0).toLocaleString('id-ID', { minimumFractionDigits: 0 });
+    }
+
+    function getProductData(productId) {
+        return products.find(p => p.id == productId);
+    }
+
+    function updateUnitOptions(row, productId) {
+        const product = getProductData(productId);
+        const unitSelect = row.querySelector('.unit-select');
+        const priceInput = row.querySelector('.price-input');
+        
+        if (!product || !unitSelect) return;
+
+        // Reset unit options
+        unitSelect.innerHTML = '';
+        
+        // Tambah option kemasan
+        const kemasanOption = document.createElement('option');
+        kemasanOption.value = 'kemasan';
+        kemasanOption.textContent = product.unit_kemasan + ' - Rp ' + product.price.toLocaleString('id-ID');
+        kemasanOption.dataset.price = product.price;
+        unitSelect.appendChild(kemasanOption);
+        
+        // Tambah option eceran jika tersedia
+        if (product.jual_eceran && product.harga_eceran > 0) {
+            const eceranOption = document.createElement('option');
+            eceranOption.value = 'eceran';
+            eceranOption.textContent = product.unit_terkecil + ' - Rp ' + product.harga_eceran.toLocaleString('id-ID');
+            eceranOption.dataset.price = product.harga_eceran;
+            unitSelect.appendChild(eceranOption);
+        }
+        
+        // Set harga default (kemasan)
+        priceInput.value = product.price;
+    }
+
+    function updatePriceByUnit(row) {
+        const unitSelect = row.querySelector('.unit-select');
+        const priceInput = row.querySelector('.price-input');
+        const selectedOption = unitSelect?.selectedOptions[0];
+        
+        if (selectedOption && selectedOption.dataset.price) {
+            priceInput.value = selectedOption.dataset.price;
+        }
+        
+        recalc();
     }
 
     function recalc() {
@@ -233,24 +300,42 @@
     function addRow(productId = '', price = '') {
         const index = itemsTableBody.querySelectorAll('tr').length;
         const row = document.createElement('tr');
+        
+        const productOptions = products.map(p => {
+            const info = p.jual_eceran ? ` (${p.unit_kemasan} / ${p.unit_terkecil})` : '';
+            return `<option value="${p.id}" 
+                        data-price="${p.price}"
+                        data-jual-eceran="${p.jual_eceran ? 1 : 0}"
+                        data-harga-eceran="${p.harga_eceran}"
+                        data-unit-kemasan="${p.unit_kemasan}"
+                        data-unit-terkecil="${p.unit_terkecil}"
+                        data-isi-per-kemasan="${p.isi_per_kemasan}"
+                        ${p.id == productId ? 'selected' : ''}>${p.label}${info}</option>`;
+        }).join('');
+        
         row.innerHTML = `
             <td>
-                <select name="items[${index}][product_id]" class="form-select product-select" required>
-                    <option value="" disabled selected>Pilih produk</option>
-                    ${products.map(p => `<option value="${p.id}" data-price="${p.price}" ${p.id == productId ? 'selected' : ''}>${p.label}</option>`).join('')}
+                <select name="items[${index}][product_id]" class="form-select product-select" required data-row="${index}">
+                    <option value="" disabled ${!productId ? 'selected' : ''}>Pilih produk</option>
+                    ${productOptions}
                 </select>
             </td>
-            <td><input type="number" name="items[${index}][qty]" class="form-control text-end qty-input" min="1" value="1" required></td>
+            <td>
+                <select name="items[${index}][unit]" class="form-select unit-select" required data-row="${index}">
+                    <option value="kemasan" selected>Kemasan</option>
+                </select>
+            </td>
+            <td><input type="number" name="items[${index}][qty]" class="form-control text-end qty-input" min="1" value="1" required data-row="${index}"></td>
             <td>
                 <div class="input-group">
                     <span class="input-group-text">Rp</span>
-                    <input type="number" step="0.01" min="0" name="items[${index}][price]" class="form-control text-end price-input" value="${price}" required>
+                    <input type="number" step="0.01" min="0" name="items[${index}][price]" class="form-control text-end price-input" value="${price}" required data-row="${index}">
                 </div>
             </td>
             <td>
                 <div class="input-group">
                     <span class="input-group-text">Rp</span>
-                    <input type="number" step="0.01" min="0" name="items[${index}][discount]" class="form-control text-end discount-input" value="0">
+                    <input type="number" step="0.01" min="0" name="items[${index}][discount]" class="form-control text-end discount-input" value="0" data-row="${index}">
                 </div>
             </td>
             <td class="text-end line-total">0</td>
@@ -259,6 +344,12 @@
             </td>
         `;
         itemsTableBody.appendChild(row);
+        
+        // Update unit options jika productId ada
+        if (productId) {
+            updateUnitOptions(row, productId);
+        }
+        
         recalc();
     }
 
@@ -277,10 +368,19 @@
     itemsTableBody?.addEventListener('change', function(event) {
         if (event.target.classList.contains('product-select')) {
             const opt = event.target.selectedOptions[0];
-            const price = opt?.dataset?.price || '';
+            const productId = opt?.value;
             const row = event.target.closest('tr');
-            row.querySelector('.price-input').value = price;
+            
+            if (productId && row) {
+                updateUnitOptions(row, productId);
+            }
         }
+        
+        if (event.target.classList.contains('unit-select')) {
+            const row = event.target.closest('tr');
+            updatePriceByUnit(row);
+        }
+        
         recalc();
     });
 
@@ -308,6 +408,18 @@
             addRow(match.id, match.price);
             productSearchInput.value = '';
         }
+    });
+
+    // Initialize unit options untuk existing rows
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = itemsTableBody.querySelectorAll('tr');
+        rows.forEach(row => {
+            const productSelect = row.querySelector('.product-select');
+            if (productSelect && productSelect.value) {
+                updateUnitOptions(row, productSelect.value);
+            }
+        });
+        recalc();
     });
 
     recalc();

@@ -41,6 +41,12 @@ class ProductRequest extends FormRequest
             'lokasi_rak' => ['nullable', 'string', 'max:100'],
             'minimal_stok' => ['required', 'integer', 'min:0'],
             'konsinyasi' => ['sometimes', 'boolean'],
+            
+            // Field untuk penjualan eceran
+            'jual_eceran' => ['sometimes', 'boolean'],
+            'unit_kemasan' => ['nullable', 'required_if:jual_eceran,1', 'string', 'max:50'],
+            'unit_terkecil' => ['nullable', 'required_if:jual_eceran,1', 'string', 'max:50'],
+            'isi_per_kemasan' => ['nullable', 'required_if:jual_eceran,1', 'integer', 'min:1'],
         ];
     }
 }

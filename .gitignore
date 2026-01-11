@@ -27,3 +27,16 @@ desktop.ini
 /.fleet
 /.idea
 /.vscode
+
+# Ngrok & Cloudflare tools
+ngrok.exe
+ngrok.zip
+cloudflared.exe
+*.key
+config.yml
+server_private.key
+server_public.key
+client_private.key
+client_public.key
+wg0.conf
+client.conf

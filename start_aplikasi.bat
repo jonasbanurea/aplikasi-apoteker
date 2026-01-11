@@ -59,6 +59,15 @@ timeout /t 5 /nobreak >nul
 
 echo [5/5] Opening browser...
 timeout /t 2 /nobreak >nul
+
+REM Dapatkan IP Address otomatis
+for /f "tokens=2 delims=:" %%a in ('ipconfig ^| findstr /c:"IPv4 Address"') do (
+    set IP_ADDRESS=%%a
+    goto :found_ip
+)
+:found_ip
+set IP_ADDRESS=%IP_ADDRESS:~1%
+
 if "%BROWSER%"=="chrome" (
     start "" chrome http://localhost:%APP_PORT%
 ) else (
@@ -68,7 +77,16 @@ if "%BROWSER%"=="chrome" (
 echo.
 echo ========================================
 echo  Application Started Successfully!
-echo  Access: http://localhost:%APP_PORT%
+echo ========================================
+echo.
+echo [AKSES DARI KOMPUTER INI]
+echo   http://localhost:%APP_PORT%
+echo.
+echo [AKSES DARI DEVICE LAIN (HP/Tablet)]
+echo   http://%IP_ADDRESS%:%APP_PORT%
+echo.
+echo Pastikan device lain terhubung ke WiFi yang sama
+echo Lihat PANDUAN_AKSES_JARINGAN.md untuk detail
 echo ========================================
 echo.
 echo Press any key to exit this window...

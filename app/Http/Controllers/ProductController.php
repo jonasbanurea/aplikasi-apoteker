@@ -91,6 +91,14 @@ class ProductController extends Controller
         $data = $request->validated();
         $data['wajib_resep'] = $request->boolean('wajib_resep');
         $data['konsinyasi'] = $request->boolean('konsinyasi');
+        $data['jual_eceran'] = $request->boolean('jual_eceran');
+
+        // Jika jual_eceran tidak dicentang, set field terkait ke null
+        if (!$data['jual_eceran']) {
+            $data['unit_kemasan'] = null;
+            $data['unit_terkecil'] = null;
+            $data['isi_per_kemasan'] = null;
+        }
 
         return $data;
     }
