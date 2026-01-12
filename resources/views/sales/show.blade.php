@@ -6,16 +6,28 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h4 class="mb-0">{{ $sale->invoice_no }}</h4>
+        <h4 class="mb-0">
+            {{ $sale->invoice_no }}
+            @if($sale->is_cancelled)
+                <span class="badge bg-danger ms-2">DIBATALKAN</span>
+            @endif
+        </h4>
         <small class="text-muted">{{ $sale->sale_date?->format('d M Y H:i') }}</small>
     </div>
     <div>
-        <a href="{{ route('sales.print', $sale) }}" class="btn btn-outline-primary" target="_blank">
-            <i class="bi bi-printer"></i> Cetak HTML
-        </a>
-        <a href="{{ route('sales.print-thermal', $sale) }}" class="btn btn-primary" download>
-            <i class="bi bi-receipt"></i> Print Thermal 58mm
-        </a>
+        @if(!$sale->is_cancelled)
+            <a href="{{ route('sales.print', $sale) }}" class="btn btn-outline-primary" target="_blank">
+                <i class="bi bi-printer"></i> Cetak HTML
+            </a>
+            <a href="{{ route('sales.print-thermal', $sale) }}" class="btn btn-primary" download>
+                <i class="bi bi-receipt"></i> Print Thermal 58mm
+            </a>
+            @role('owner')
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                    <i class="bi bi-x-circle"></i> Batalkan
+                </button>
+            @endrole
+        @endif
         <a href="{{ route('sales.index') }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Kembali
         </a>
@@ -53,6 +65,16 @@
                 <div class="text-muted small">Catatan</div>
                 <div>{{ $sale->catatan ?? '-' }}</div>
             </div>
+            @if($sale->is_cancelled)
+                <div class="col-md-12">
+                    <div class="alert alert-danger mb-0 mt-2">
+                        <strong><i class="bi bi-exclamation-triangle"></i> Transaksi Dibatalkan</strong><br>
+                        <small>Dibatalkan oleh: {{ $sale->cancelledBy?->name ?? '-' }}</small><br>
+                        <small>Waktu: {{ $sale->cancelled_at?->format('d M Y H:i') }}</small><br>
+                        <small>Alasan: {{ $sale->cancel_reason ?? '-' }}</small>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </div>
@@ -117,4 +139,38 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Konfirmasi Cancel -->
+@role('owner')
+@if(!$sale->is_cancelled)
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cancelModalLabel">Batalkan Transaksi</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('sales.cancel', $sale) }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        <strong>Perhatian!</strong> Pembatalan transaksi akan mengembalikan stok produk.
+                    </div>
+                    <p>Apakah Anda yakin ingin membatalkan transaksi <strong>{{ $sale->invoice_no }}</strong>?</p>
+                    <div class="mb-3">
+                        <label for="cancel_reason" class="form-label">Alasan Pembatalan</label>
+                        <textarea class="form-control" id="cancel_reason" name="cancel_reason" rows="3" required>Transaksi duplikat</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger">Ya, Batalkan Transaksi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+@endrole
 @endsection

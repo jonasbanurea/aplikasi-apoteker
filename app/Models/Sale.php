@@ -26,6 +26,10 @@ class Sale extends Model
         'no_resep',
         'dokter',
         'catatan',
+        'is_cancelled',
+        'cancelled_at',
+        'cancelled_by',
+        'cancel_reason',
     ];
 
     protected $casts = [
@@ -35,6 +39,8 @@ class Sale extends Model
         'total' => 'decimal:2',
         'paid_amount' => 'decimal:2',
         'change_amount' => 'decimal:2',
+        'is_cancelled' => 'boolean',
+        'cancelled_at' => 'datetime',
     ];
 
     public function user()
@@ -50,5 +56,10 @@ class Sale extends Model
     public function items()
     {
         return $this->hasMany(SaleItem::class);
+    }
+
+    public function cancelledBy()
+    {
+        return $this->belongsTo(User::class, 'cancelled_by');
     }
 }

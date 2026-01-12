@@ -281,4 +281,58 @@ class SaleController extends Controller
 
         return 'POS-' . $now . '-' . $rand;
     }
+
+    public function cancel(Request $request, Sale $sale)
+    {
+        // Validasi hanya owner yang bisa cancel
+        if (!$request->user()->hasRole('owner')) {
+            return back()->with('error', 'Hanya owner yang dapat membatalkan transaksi.');
+        }
+
+        // Cek apakah sudah dibatalkan
+        if ($sale->is_cancelled) {
+            return back()->with('error', 'Transaksi ini sudah dibatalkan sebelumnya.');
+        }
+
+        try {
+            DB::transaction(function () use ($sale, $request) {
+                // Load items dengan batches
+                $sale->load(['items.batches.stockBatch']);
+
+                foreach ($sale->items as $item) {
+                    foreach ($item->batches as $saleItemBatch) {
+                        $batch = $saleItemBatch->stockBatch;
+                        $qty = $saleItemBatch->qty;
+
+                        // Kembalikan stok ke batch
+                        $batch->increment('qty_on_hand', $qty);
+
+                        // Buat stock movement reversal
+                        StockMovement::create([
+                            'type' => 'IN',
+                            'batch_id' => $batch->id,
+                            'product_id' => $item->product_id,
+                            'qty' => $qty,
+                            'ref_type' => 'SALE_CANCEL',
+                            'ref_id' => $sale->id,
+                            'user_id' => $request->user()->id,
+                            'notes' => 'Pembatalan penjualan ' . $sale->invoice_no,
+                        ]);
+                    }
+                }
+
+                // Update status sale menjadi cancelled
+                $sale->update([
+                    'is_cancelled' => true,
+                    'cancelled_at' => Carbon::now(),
+                    'cancelled_by' => $request->user()->id,
+                    'cancel_reason' => $request->input('cancel_reason', 'Transaksi dibatalkan oleh owner'),
+                ]);
+            });
+
+            return back()->with('success', 'Transaksi berhasil dibatalkan. Stok telah dikembalikan.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal membatalkan transaksi: ' . $e->getMessage());
+        }
+    }
 }

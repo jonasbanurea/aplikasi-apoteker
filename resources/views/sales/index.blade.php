@@ -33,12 +33,13 @@
                         <th class="text-end">Total</th>
                         <th class="text-end">Bayar</th>
                         <th class="text-end">Kembali</th>
+                        <th>Status</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($sales as $sale)
-                        <tr>
+                        <tr class="{{ $sale->is_cancelled ? 'table-danger' : '' }}">
                             <td>{{ $sales->firstItem() + $loop->index }}</td>
                             <td>{{ $sale->sale_date?->format('d M Y H:i') }}</td>
                             <td class="fw-semibold">{{ $sale->invoice_no }}</td>
@@ -54,17 +55,26 @@
                             <td class="text-end">Rp {{ number_format($sale->paid_amount, 2, ',', '.') }}</td>
                             <td class="text-end">Rp {{ number_format($sale->change_amount, 2, ',', '.') }}</td>
                             <td>
+                                @if($sale->is_cancelled)
+                                    <span class="badge bg-danger">DIBATALKAN</span>
+                                @else
+                                    <span class="badge bg-success">AKTIF</span>
+                                @endif
+                            </td>
+                            <td>
                                 <a href="{{ route('sales.show', $sale) }}" class="btn btn-sm btn-outline-secondary">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <a href="{{ route('sales.print', $sale) }}" class="btn btn-sm btn-outline-primary" target="_blank">
-                                    <i class="bi bi-printer"></i>
-                                </a>
+                                @if(!$sale->is_cancelled)
+                                    <a href="{{ route('sales.print', $sale) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        <i class="bi bi-printer"></i>
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="text-center text-muted">Belum ada penjualan</td>
+                            <td colspan="10" class="text-center text-muted">Belum ada penjualan</td>
                         </tr>
                     @endforelse
                 </tbody>
