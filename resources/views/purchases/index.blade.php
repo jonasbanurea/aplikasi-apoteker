@@ -10,9 +10,19 @@
         <small class="text-muted">Catat penerimaan barang dan status hutang/konsinyasi</small>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('purchases.export') }}" class="btn btn-success">
-            <i class="bi bi-file-earmark-excel"></i> Export Excel
-        </a>
+        <div class="btn-group">
+            <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-file-earmark-excel"></i> Export Excel
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ route('purchases.export', ['type' => 'summary']) }}">
+                    <i class="bi bi-table"></i> Export Ringkasan
+                </a></li>
+                <li><a class="dropdown-item" href="{{ route('purchases.export', ['type' => 'detail']) }}">
+                    <i class="bi bi-list-ul"></i> Export Detail Item
+                </a></li>
+            </ul>
+        </div>
         @if(auth()->user()->hasAnyRole('owner', 'admin_gudang'))
         <a href="{{ route('purchases.create') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle"></i> Penerimaan Baru

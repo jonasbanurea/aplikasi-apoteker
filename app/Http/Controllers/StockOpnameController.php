@@ -53,7 +53,17 @@ class StockOpnameController extends Controller
             ->orderBy('batch_no')
             ->get();
 
-        return view('stock_opnames.create', compact('batches'));
+        // Get total quantity sold per product
+        $qtySoldPerProduct = DB::table('sale_items')
+            ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
+            ->where('sales.is_cancelled', false)
+            ->select('sale_items.product_id', DB::raw('SUM(sale_items.qty) as total_qty'))
+            ->groupBy('sale_items.product_id')
+            ->get()
+            ->pluck('total_qty', 'product_id')
+            ->toArray();
+
+        return view('stock_opnames.create', compact('batches', 'qtySoldPerProduct'));
     }
 
     public function store(StockOpnameStoreRequest $request)

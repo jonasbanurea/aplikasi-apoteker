@@ -35,6 +35,6 @@ class Shift extends Model
 
     public function sales()
     {
-        return $this->hasMany(Sale::class);
+        return $this->hasMany(Sale::class)->where('is_cancelled', false);
     }
 }

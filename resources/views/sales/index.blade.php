@@ -10,12 +10,46 @@
         <small class="text-muted">Riwayat transaksi POS</small>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('sales.export') }}" class="btn btn-success">
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exportModal">
             <i class="bi bi-file-earmark-excel"></i> Export Excel
-        </a>
+        </button>
         <a href="{{ route('sales.create') }}" class="btn btn-primary">
             <i class="bi bi-cart-plus"></i> Transaksi Baru
         </a>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="GET" action="{{ route('sales.index') }}" id="filterForm">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Tanggal Mulai</label>
+                    <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Tanggal Akhir</label>
+                    <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Cari Produk</label>
+                    <input type="text" name="product_search" class="form-control" placeholder="Nama/SKU Produk" value="{{ request('product_search') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Cari Invoice</label>
+                    <input type="text" name="invoice_search" class="form-control" placeholder="No Invoice" value="{{ request('invoice_search') }}">
+                </div>
+            </div>
+            <div class="mt-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Cari
+                </button>
+                <a href="{{ route('sales.index') }}" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> Reset
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -86,6 +120,41 @@
                 Menampilkan {{ $sales->firstItem() ?? 0 }} - {{ $sales->lastItem() ?? 0 }} dari {{ $sales->total() }} data
             </div>
             {{ $sales->links() }}
+        </div>
+    </div>
+</div>
+
+<!-- Export Modal -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportModalLabel">Export Excel Penjualan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="GET" action="{{ route('sales.export') }}">
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Export akan mengunduh semua data penjualan sesuai filter tanggal yang dipilih.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tanggal Mulai</label>
+                        <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
+                        <small class="text-muted">Kosongkan untuk export semua data</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tanggal Akhir</label>
+                        <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
+                        <small class="text-muted">Kosongkan untuk export semua data</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-download"></i> Download Excel
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

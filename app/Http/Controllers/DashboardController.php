@@ -44,20 +44,31 @@ class DashboardController extends Controller
         $startOfLastMonth = $lastMonth->copy()->startOfMonth();
         $endOfLastMonth = $lastMonth->copy()->endOfMonth();
 
-        // Sales data
-        $totalRevenue = Sale::whereBetween('sale_date', [$startOfMonth, $endOfMonth])->sum('total');
-        $totalRevenueLastMonth = Sale::whereBetween('sale_date', [$startOfLastMonth, $endOfLastMonth])->sum('total');
+        // Sales data (exclude cancelled transactions)
+        $totalRevenue = Sale::whereBetween('sale_date', [$startOfMonth, $endOfMonth])
+            ->where('is_cancelled', false)
+            ->sum('total');
+        $totalRevenueLastMonth = Sale::whereBetween('sale_date', [$startOfLastMonth, $endOfLastMonth])
+            ->where('is_cancelled', false)
+            ->sum('total');
         $revenueGrowth = $totalRevenueLastMonth > 0 
             ? (($totalRevenue - $totalRevenueLastMonth) / $totalRevenueLastMonth) * 100 
             : 0;
 
-        $todayTransactions = Sale::whereDate('sale_date', $today)->count();
-        $todayRevenue = Sale::whereDate('sale_date', $today)->sum('total');
+        $todayTransactions = Sale::whereDate('sale_date', $today)
+            ->where('is_cancelled', false)
+            ->count();
+        $todayRevenue = Sale::whereDate('sale_date', $today)
+            ->where('is_cancelled', false)
+            ->sum('total');
         $todayItems = DB::table('sale_items')
             ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
             ->whereDate('sales.sale_date', $today)
+            ->where('sales.is_cancelled', false)
             ->sum('sale_items.qty');
-        $totalTransactions = Sale::whereBetween('sale_date', [$startOfMonth, $endOfMonth])->count();
+        $totalTransactions = Sale::whereBetween('sale_date', [$startOfMonth, $endOfMonth])
+            ->where('is_cancelled', false)
+            ->count();
 
         // Stock data
         $totalProducts = Product::count();
@@ -92,19 +103,21 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Recent sales (latest 5)
+        // Recent sales (latest 5, exclude cancelled)
         $recentSales = Sale::with('user:id,name')
+            ->where('is_cancelled', false)
             ->latest('sale_date')
             ->limit(5)
             ->get();
 
-        // Sales chart (last 7 days)
+        // Sales chart (last 7 days, exclude cancelled)
         $salesChart = Sale::select(
                 DB::raw('DATE(sale_date) as date'),
                 DB::raw('COUNT(*) as count'),
                 DB::raw('SUM(total) as total')
             )
             ->where('sale_date', '>=', $today->copy()->subDays(6))
+            ->where('is_cancelled', false)
             ->groupBy('date')
             ->orderBy('date')
             ->get()
@@ -121,11 +134,12 @@ class DashboardController extends Controller
             ];
         }
 
-        // Top products (this month)
+        // Top products (this month, exclude cancelled)
         $topProducts = DB::table('sale_items')
             ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
             ->join('products', 'products.id', '=', 'sale_items.product_id')
             ->whereBetween('sales.sale_date', [$startOfMonth, $endOfMonth])
+            ->where('sales.is_cancelled', false)
             ->select(
                 'products.nama_dagang',
                 'products.sku',

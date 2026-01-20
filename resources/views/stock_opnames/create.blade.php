@@ -36,6 +36,7 @@
                             <th>Produk</th>
                             <th>ED</th>
                             <th class="text-end">Qty Sistem</th>
+                            <th class="text-end">Qty Terjual</th>
                             <th class="text-end">Qty Fisik</th>
                             <th>Reason</th>
                             <th>Catatan</th>
@@ -53,6 +54,7 @@
                                     <td class="product-name text-wrap"></td>
                                     <td class="expired-date"></td>
                                     <td class="text-end system-qty">0</td>
+                                    <td class="text-end text-muted qty-sold">0</td>
                                     <td>
                                         <input type="number" name="items[{{ $i }}][physical_qty]" class="form-control text-end" min="0" value="{{ $oldItem['physical_qty'] ?? 0 }}" required>
                                     </td>
@@ -90,14 +92,16 @@
 <script>
 (function() {
     @php
-        $batchPayload = $batches->map(function ($b) {
+        $batchPayload = $batches->map(function ($b) use ($qtySoldPerProduct) {
             return [
                 'id' => $b->id,
                 'batch_no' => $b->batch_no,
                 'product' => $b->product?->nama_dagang,
                 'sku' => $b->product?->sku,
+                'product_id' => $b->product_id,
                 'expired_date' => $b->expired_date ? $b->expired_date->format('Y-m-d') : null,
                 'qty_on_hand' => $b->qty_on_hand,
+                'qty_sold' => $qtySoldPerProduct[$b->product_id] ?? 0,
             ];
         })->values();
     @endphp
@@ -120,6 +124,7 @@
         const prodCell = row.querySelector('.product-name');
         const expiredCell = row.querySelector('.expired-date');
         const systemCell = row.querySelector('.system-qty');
+        const qtySoldCell = row.querySelector('.qty-sold');
         const physicalInput = row.querySelector('input[name$="[physical_qty]"]');
         const batch = findBatch(select.value);
 
@@ -127,6 +132,7 @@
             prodCell.textContent = `${batch.sku ?? ''} - ${batch.product ?? ''}`;
             expiredCell.textContent = batch.expired_date ?? '-';
             systemCell.textContent = batch.qty_on_hand;
+            qtySoldCell.textContent = batch.qty_sold ?? 0;
             meta.textContent = batch.expired_date ? `ED ${batch.expired_date}` : '';
             if (!physicalInput.value) {
                 physicalInput.value = batch.qty_on_hand;
@@ -135,6 +141,7 @@
             prodCell.textContent = '';
             expiredCell.textContent = '';
             systemCell.textContent = '';
+            qtySoldCell.textContent = '0';
             meta.textContent = '';
         }
     }
@@ -153,6 +160,7 @@
             <td class="product-name text-wrap"></td>
             <td class="expired-date"></td>
             <td class="text-end system-qty">0</td>
+            <td class="text-end text-muted qty-sold">0</td>
             <td><input type="number" name="items[${idx}][physical_qty]" class="form-control text-end" min="0" value="${old.physical_qty ?? ''}" required></td>
             <td>
                 <select name="items[${idx}][reason]" class="form-select" required>

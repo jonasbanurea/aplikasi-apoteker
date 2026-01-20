@@ -86,6 +86,27 @@ class ProductController extends Controller
         );
     }
 
+    public function lowStock(Request $request)
+    {
+        $search = $request->get('q');
+
+        $products = Product::query()
+            ->selectRaw('products.*, (SELECT COALESCE(SUM(qty_on_hand), 0) FROM stock_batches WHERE stock_batches.product_id = products.id) as current_stock')
+            ->whereRaw('(SELECT COALESCE(SUM(qty_on_hand), 0) FROM stock_batches WHERE stock_batches.product_id = products.id) <= products.minimal_stok')
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('sku', 'like', "%{$search}%")
+                        ->orWhere('nama_dagang', 'like', "%{$search}%")
+                        ->orWhere('nama_generik', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('nama_dagang')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('products.low-stock', compact('products', 'search'));
+    }
+
     private function mapData(ProductRequest $request): array
     {
         $data = $request->validated();

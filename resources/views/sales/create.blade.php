@@ -61,14 +61,10 @@
 
             <div class="mb-3">
                 <label class="form-label">Cari Produk (SKU / Nama)</label>
-                <div class="input-group">
-                    <input list="productSearchList" id="productSearch" class="form-control" placeholder="Ketik SKU atau nama produk">
-                    <datalist id="productSearchList">
-                        @foreach($products as $product)
-                            <option value="{{ $product->sku }} - {{ $product->nama_dagang }}" data-id="{{ $product->id }}" data-price="{{ $product->harga_jual }}"></option>
-                        @endforeach
-                    </datalist>
+                <div class="input-group position-relative">
+                    <input type="text" id="productSearch" class="form-control" placeholder="Ketik SKU atau nama produk" autocomplete="off">
                     <button type="button" class="btn btn-outline-primary" id="addFromSearch"><i class="bi bi-plus-circle"></i> Tambah</button>
+                    <div id="searchResults" class="list-group position-absolute w-100 shadow-sm" style="top: 100%; z-index: 1050; max-height: 300px; overflow-y: auto; display: none;"></div>
                 </div>
             </div>
 
@@ -193,6 +189,8 @@
     $productsJson = $products
         ->map(fn($p) => [
             'id' => $p->id,
+            'sku' => $p->sku,
+            'nama_dagang' => $p->nama_dagang,
             'label' => $p->sku . ' - ' . $p->nama_dagang,
             'price' => (float) $p->harga_jual,
             'jual_eceran' => (bool) $p->jual_eceran,
@@ -211,10 +209,13 @@
     const addItemBtn = document.getElementById('addItemRow');
     const addFromSearchBtn = document.getElementById('addFromSearch');
     const productSearchInput = document.getElementById('productSearch');
+    const searchResultsDiv = document.getElementById('searchResults');
     const discountTotalInput = document.getElementById('discountTotal');
     const paymentMethodSelect = document.getElementById('paymentMethod');
     const paidAmountInput = document.getElementById('paidAmount');
     const paidAmountWrap = document.getElementById('paidAmountWrap');
+
+    let selectedProduct = null;
 
     function formatRupiah(value) {
         return 'Rp ' + Number(value || 0).toLocaleString('id-ID', { minimumFractionDigits: 0 });
@@ -402,11 +403,88 @@
     paidAmountInput?.addEventListener('input', recalc);
 
     addFromSearchBtn?.addEventListener('click', function() {
-        const val = productSearchInput.value;
-        const match = products.find(p => val && val.toLowerCase() === p.label.toLowerCase());
-        if (match) {
-            addRow(match.id, match.price);
+        if (selectedProduct) {
+            addRow(selectedProduct.id, selectedProduct.price);
             productSearchInput.value = '';
+            searchResultsDiv.style.display = 'none';
+            selectedProduct = null;
+        }
+    });
+
+    // Search functionality
+    productSearchInput?.addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase().trim();
+        
+        if (query.length < 2) {
+            searchResultsDiv.style.display = 'none';
+            searchResultsDiv.innerHTML = '';
+            selectedProduct = null;
+            return;
+        }
+        
+        const filtered = products.filter(p => {
+            const sku = (p.sku || '').toLowerCase();
+            const nama = (p.nama_dagang || '').toLowerCase();
+            return sku.includes(query) || nama.includes(query);
+        }).slice(0, 10); // Limit 10 results
+        
+        if (filtered.length === 0) {
+            searchResultsDiv.style.display = 'none';
+            searchResultsDiv.innerHTML = '';
+            selectedProduct = null;
+            return;
+        }
+        
+        searchResultsDiv.innerHTML = filtered.map(p => {
+            const info = p.jual_eceran ? ` (${p.unit_kemasan}/${p.unit_terkecil})` : '';
+            return `
+                <a href="#" class="list-group-item list-group-item-action search-result-item" data-id="${p.id}" data-price="${p.price}">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>${p.sku}</strong> - ${p.nama_dagang}${info}
+                        </div>
+                        <span class="badge bg-primary">${formatRupiah(p.price)}</span>
+                    </div>
+                </a>
+            `;
+        }).join('');
+        
+        searchResultsDiv.style.display = 'block';
+    });
+
+    // Handle search result click
+    searchResultsDiv?.addEventListener('click', function(e) {
+        e.preventDefault();
+        const item = e.target.closest('.search-result-item');
+        if (item) {
+            const productId = item.dataset.id;
+            const product = products.find(p => p.id == productId);
+            if (product) {
+                selectedProduct = product;
+                productSearchInput.value = `${product.sku} - ${product.nama_dagang}`;
+                searchResultsDiv.style.display = 'none';
+            }
+        }
+    });
+
+    // Handle Enter key
+    productSearchInput?.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const firstResult = searchResultsDiv.querySelector('.search-result-item');
+            if (firstResult) {
+                firstResult.click();
+                setTimeout(() => {
+                    addFromSearchBtn.click();
+                }, 100);
+            }
+        }
+    });
+
+    // Close search results when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!productSearchInput.contains(e.target) && !searchResultsDiv.contains(e.target)) {
+            searchResultsDiv.style.display = 'none';
         }
     });
 

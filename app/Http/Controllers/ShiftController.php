@@ -22,9 +22,9 @@ class ShiftController extends Controller
         $status = $request->input('status');
 
         $query = Shift::with('user')
-            ->withSum('sales as total_sales', 'total')
-            ->withSum(['sales as total_cash' => fn($q) => $q->where('payment_method', Sale::METHOD_CASH)], 'total')
-            ->withSum(['sales as total_non_cash' => fn($q) => $q->where('payment_method', Sale::METHOD_NON_CASH)], 'total')
+            ->withSum(['sales as total_sales' => fn($q) => $q->where('is_cancelled', false)], 'total')
+            ->withSum(['sales as total_cash' => fn($q) => $q->where('payment_method', Sale::METHOD_CASH)->where('is_cancelled', false)], 'total')
+            ->withSum(['sales as total_non_cash' => fn($q) => $q->where('payment_method', Sale::METHOD_NON_CASH)->where('is_cancelled', false)], 'total')
             ->when($date, fn($q) => $q->whereDate('opened_at', $date))
             ->when($status === 'open', fn($q) => $q->whereNull('closed_at'))
             ->when($status === 'closed', fn($q) => $q->whereNotNull('closed_at'))
@@ -124,13 +124,13 @@ class ShiftController extends Controller
 
     protected function computeTotals(Shift $shift, bool $lock = false): array
     {
-        $salesQuery = $shift->sales();
+        $salesQuery = $shift->sales()->where('is_cancelled', false);
         if ($lock) {
             $salesQuery->lockForUpdate();
         }
 
         $totalCash = (float) $salesQuery->where('payment_method', Sale::METHOD_CASH)->sum('total');
-        $totalNonCash = (float) $shift->sales()->where('payment_method', Sale::METHOD_NON_CASH)->sum('total');
+        $totalNonCash = (float) $shift->sales()->where('is_cancelled', false)->where('payment_method', Sale::METHOD_NON_CASH)->sum('total');
         $totalSales = $totalCash + $totalNonCash;
         $expectedCash = (float) $shift->opening_cash + $totalCash;
 

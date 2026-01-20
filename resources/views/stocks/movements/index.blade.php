@@ -3,6 +3,11 @@
 @section('title', 'Kartu Stok')
 @section('page-title', 'Kartu Stok')
 
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+@endpush
+
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
@@ -19,7 +24,7 @@
         <form class="row g-2 align-items-end" method="GET" action="{{ route('stock-movements.index') }}">
             <div class="col-md-4">
                 <label class="form-label">Produk</label>
-                <select name="product_id" class="form-select">
+                <select name="product_id" id="filterProductSelect" class="form-select" data-placeholder="Ketik untuk mencari produk...">
                     <option value="">Semua produk</option>
                     @foreach($products as $product)
                         <option value="{{ $product->id }}" {{ $productId == $product->id ? 'selected' : '' }}>
@@ -30,7 +35,7 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label">Batch</label>
-                <select name="batch_id" class="form-select">
+                <select name="batch_id" id="filterBatchSelect" class="form-select" data-placeholder="Ketik untuk mencari batch...">
                     <option value="">Semua batch</option>
                     @foreach($batches as $batch)
                         <option value="{{ $batch->id }}" {{ $batchId == $batch->id ? 'selected' : '' }}>
@@ -70,7 +75,7 @@
             @csrf
             <div class="col-md-4">
                 <label class="form-label">Produk</label>
-                <select name="product_id" class="form-select @error('product_id') is-invalid @enderror" required>
+                <select name="product_id" id="formProductSelect" class="form-select @error('product_id') is-invalid @enderror" required data-placeholder="Ketik untuk mencari produk...">
                     <option value="" disabled selected>Pilih produk</option>
                     @foreach($products as $product)
                         <option value="{{ $product->id }}" {{ old('product_id') == $product->id ? 'selected' : '' }}>
@@ -82,7 +87,7 @@
             </div>
             <div class="col-md-3">
                 <label class="form-label">Batch (opsional)</label>
-                <select name="batch_id" class="form-select @error('batch_id') is-invalid @enderror">
+                <select name="batch_id" id="formBatchSelect" class="form-select @error('batch_id') is-invalid @enderror" data-placeholder="Ketik untuk mencari batch...">
                     <option value="">Tanpa batch</option>
                     @foreach($batches as $batch)
                         <option value="{{ $batch->id }}" {{ old('batch_id') == $batch->id ? 'selected' : '' }}>
@@ -186,3 +191,40 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 untuk filter
+        $('#filterProductSelect, #filterBatchSelect').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            allowClear: true,
+            language: {
+                noResults: function() {
+                    return "Tidak ditemukan";
+                },
+                searching: function() {
+                    return "Mencari...";
+                }
+            }
+        });
+
+        // Initialize Select2 untuk form
+        $('#formProductSelect, #formBatchSelect').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            allowClear: true,
+            language: {
+                noResults: function() {
+                    return "Tidak ditemukan";
+                },
+                searching: function() {
+                    return "Mencari...";
+                }
+            }
+        });
+    });
+</script>
+@endpush

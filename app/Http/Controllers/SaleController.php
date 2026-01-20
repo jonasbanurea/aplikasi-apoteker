@@ -26,17 +26,31 @@ class SaleController extends Controller
 
     public function index(Request $request)
     {
-        $query = Sale::with('user')->latest('sale_date');
+        $query = Sale::with(['user', 'items.product'])->latest('sale_date');
 
         // Filter by date range
         if ($request->filled('start_date')) {
-            $query->whereDate('transaction_date', '>=', $request->start_date);
+            $query->whereDate('sale_date', '>=', $request->start_date);
         }
         if ($request->filled('end_date')) {
-            $query->whereDate('transaction_date', '<=', $request->end_date);
+            $query->whereDate('sale_date', '<=', $request->end_date);
         }
 
-        $sales = $query->paginate(15);
+        // Filter by product name (search in sale items)
+        if ($request->filled('product_search')) {
+            $productSearch = $request->product_search;
+            $query->whereHas('items.product', function($q) use ($productSearch) {
+                $q->where('nama_dagang', 'LIKE', "%{$productSearch}%")
+                  ->orWhere('sku', 'LIKE', "%{$productSearch}%");
+            });
+        }
+
+        // Filter by invoice number
+        if ($request->filled('invoice_search')) {
+            $query->where('invoice_no', 'LIKE', "%{$request->invoice_search}%");
+        }
+
+        $sales = $query->paginate(15)->withQueryString();
 
         return view('sales.index', compact('sales'));
     }

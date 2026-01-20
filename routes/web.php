@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
     // Master Data - RBAC handled in controllers
     Route::get('suppliers/export', [SupplierController::class, 'export'])->name('suppliers.export');
     Route::resource('suppliers', SupplierController::class)->except(['show']);
+    Route::get('products/low-stock', [ProductController::class, 'lowStock'])->name('products.low-stock');
     Route::get('products/export', [ProductController::class, 'export'])->name('products.export');
     Route::resource('products', ProductController::class)->except(['show']);
 
@@ -71,6 +72,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('purchases', PurchaseController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update']);
 
     // Stok
+    Route::get('stock-batches/near-expiry', [StockBatchController::class, 'nearExpiry'])->name('stock-batches.near-expiry');
     Route::get('stock-batches', [StockBatchController::class, 'index'])->name('stock-batches.index');
     Route::get('stock-batches/create', [StockBatchController::class, 'create'])->name('stock-batches.create');
     Route::post('stock-batches', [StockBatchController::class, 'store'])->name('stock-batches.store');

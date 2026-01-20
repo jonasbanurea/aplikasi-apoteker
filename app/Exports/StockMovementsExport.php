@@ -27,15 +27,15 @@ class StockMovementsExport implements FromCollection, WithHeadings, WithMapping,
 
     public function collection()
     {
-        $query = StockMovement::with(['product', 'stockBatch', 'user'])
-            ->orderBy('movement_date', 'desc');
+        $query = StockMovement::with(['product', 'batch', 'user'])
+            ->orderBy('created_at', 'desc');
 
         if ($this->startDate) {
-            $query->whereDate('movement_date', '>=', $this->startDate);
+            $query->whereDate('created_at', '>=', $this->startDate);
         }
 
         if ($this->endDate) {
-            $query->whereDate('movement_date', '<=', $this->endDate);
+            $query->whereDate('created_at', '<=', $this->endDate);
         }
 
         if ($this->productId) {
@@ -66,10 +66,10 @@ class StockMovementsExport implements FromCollection, WithHeadings, WithMapping,
     public function map($movement): array
     {
         return [
-            $movement->movement_date->format('Y-m-d H:i:s'),
+            $movement->created_at->format('Y-m-d H:i:s'),
             $movement->product->sku ?? '-',
             $movement->product->nama_dagang ?? '-',
-            $movement->stockBatch->batch_no ?? '-',
+            $movement->batch->batch_no ?? '-',
             $movement->movement_type,
             $movement->quantity,
             $movement->qty_before,

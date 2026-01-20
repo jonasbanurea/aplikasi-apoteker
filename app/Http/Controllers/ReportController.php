@@ -55,7 +55,8 @@ class ReportController extends Controller
         $start = $filters['start'];
         $end = $filters['end'];
 
-        $salesBase = Sale::whereBetween('sale_date', [$start, $end]);
+        $salesBase = Sale::whereBetween('sale_date', [$start, $end])
+            ->where('is_cancelled', false);
 
         $salesByPeriod = $this->groupSalesByPeriod($filters['group_by'], clone $salesBase);
         $salesPerCashier = (clone $salesBase)
@@ -71,6 +72,7 @@ class ReportController extends Controller
             )
             ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
             ->whereBetween('sales.sale_date', [$start, $end])
+            ->where('sales.is_cancelled', false)
             ->with('product:id,sku,nama_dagang,golongan')
             ->groupBy('sale_items.product_id')
             ->orderByDesc('revenue')
@@ -85,12 +87,14 @@ class ReportController extends Controller
             ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
             ->join('products', 'products.id', '=', 'sale_items.product_id')
             ->whereBetween('sales.sale_date', [$start, $end])
+            ->where('sales.is_cancelled', false)
             ->groupBy('products.golongan')
             ->orderByDesc('revenue')
             ->get();
 
         $weeklyPayment = Sale::select('payment_method', DB::raw('SUM(total) as total_amount'))
             ->where('sale_date', '>=', now()->subDays(7))
+            ->where('is_cancelled', false)
             ->groupBy('payment_method')
             ->get();
 
@@ -220,6 +224,7 @@ class ReportController extends Controller
             ->leftJoin('stock_batches', 'stock_batches.id', '=', 'sale_item_batches.stock_batch_id')
             ->leftJoin('products', 'products.id', '=', 'sale_items.product_id')
             ->whereBetween('sales.sale_date', [$start, $end])
+            ->where('sales.is_cancelled', false)
             ->groupBy('sale_items.product_id', 'products.nama_dagang', 'products.sku')
             ->select(
                 'sale_items.product_id',
@@ -245,6 +250,7 @@ class ReportController extends Controller
 
         $sales30 = SaleItem::join('sales', 'sales.id', '=', 'sale_items.sale_id')
             ->where('sales.sale_date', '>=', now()->subDays($lookback))
+            ->where('sales.is_cancelled', false)
             ->select('sale_items.product_id', DB::raw('SUM(sale_items.qty) as qty30'))
             ->groupBy('sale_items.product_id')
             ->get()

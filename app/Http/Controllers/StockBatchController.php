@@ -66,4 +66,60 @@ class StockBatchController extends Controller
 
         return redirect()->route('stock-batches.index')->with('success', 'Batch stok berhasil diupdate.');
     }
+
+    public function nearExpiry(Request $request)
+    {
+        $search = $request->get('q');
+        $status = $request->get('status', 'all'); // all, expired, near_expired
+        $today = now();
+        $thresholdDays = 30;
+
+        $batches = StockBatch::with('product')
+            ->whereNotNull('expired_date')
+            ->where('qty_on_hand', '>', 0) // Only show batches with stock
+            ->when($status === 'expired', function ($q) use ($today) {
+                $q->where('expired_date', '<', $today);
+            })
+            ->when($status === 'near_expired', function ($q) use ($today, $thresholdDays) {
+                $q->whereBetween('expired_date', [$today, $today->copy()->addDays($thresholdDays)]);
+            })
+            ->when($status === 'all', function ($q) use ($today, $thresholdDays) {
+                $q->where(function ($sub) use ($today, $thresholdDays) {
+                    $sub->where('expired_date', '<', $today)
+                        ->orWhereBetween('expired_date', [$today, $today->copy()->addDays($thresholdDays)]);
+                });
+            })
+            ->when($search, function ($q) use ($search) {
+                $q->whereHas('product', function ($sub) use ($search) {
+                    $sub->where('sku', 'like', "%{$search}%")
+                        ->orWhere('nama_dagang', 'like', "%{$search}%")
+                        ->orWhere('nama_generik', 'like', "%{$search}%");
+                })
+                ->orWhere('batch_no', 'like', "%{$search}%");
+            })
+            ->orderByRaw('CASE WHEN expired_date < NOW() THEN 0 ELSE 1 END')
+            ->orderBy('expired_date')
+            ->paginate(20)
+            ->withQueryString();
+
+        // Count statistics
+        $expiredCount = StockBatch::whereNotNull('expired_date')
+            ->where('expired_date', '<', $today)
+            ->where('qty_on_hand', '>', 0)
+            ->count();
+
+        $nearExpiredCount = StockBatch::whereNotNull('expired_date')
+            ->whereBetween('expired_date', [$today, $today->copy()->addDays($thresholdDays)])
+            ->where('qty_on_hand', '>', 0)
+            ->count();
+
+        return view('stocks.batches.near-expiry', compact(
+            'batches',
+            'search',
+            'status',
+            'thresholdDays',
+            'expiredCount',
+            'nearExpiredCount'
+        ));
+    }
 }

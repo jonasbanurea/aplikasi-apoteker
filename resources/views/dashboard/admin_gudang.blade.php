@@ -32,20 +32,22 @@
 
     <!-- Stok Menipis -->
     <div class="col-xl-3 col-md-6">
-        <div class="card stat-card warning">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-muted mb-2">Stok Menipis</h6>
-                        <h3 class="mb-0">{{ number_format($reorderAlerts, 0, ',', '.') }}</h3>
-                        <small class="text-warning"><i class="bi bi-exclamation-triangle"></i> Perlu restock</small>
-                    </div>
-                    <div class="text-warning fs-1">
-                        <i class="bi bi-exclamation-triangle"></i>
+        <a href="{{ route('products.low-stock') }}" class="text-decoration-none">
+            <div class="card stat-card warning hover-shadow">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-2">Stok Menipis</h6>
+                            <h3 class="mb-0">{{ number_format($reorderAlerts, 0, ',', '.') }}</h3>
+                            <small class="text-warning"><i class="bi bi-exclamation-triangle"></i> Perlu restock</small>
+                        </div>
+                        <div class="text-warning fs-1">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- Obat Masuk -->

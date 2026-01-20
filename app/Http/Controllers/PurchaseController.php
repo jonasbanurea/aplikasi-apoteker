@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\PurchasesExport;
+use App\Exports\PurchaseItemsExport;
 use App\Http\Requests\PurchaseStoreRequest;
 use App\Models\Product;
 use App\Models\Purchase;
@@ -302,9 +303,14 @@ class PurchaseController extends Controller
     {
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
+        $type = $request->input('type', 'summary'); // summary atau detail
 
-        $filename = 'purchases-' . date('Y-m-d') . '.xlsx';
-        
+        if ($type === 'detail') {
+            $filename = 'purchase-items-detail-' . date('Y-m-d') . '.xlsx';
+            return Excel::download(new PurchaseItemsExport($startDate, $endDate), $filename);
+        }
+
+        $filename = 'purchases-summary-' . date('Y-m-d') . '.xlsx';
         return Excel::download(new PurchasesExport($startDate, $endDate), $filename);
     }
 }

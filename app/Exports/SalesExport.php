@@ -26,14 +26,14 @@ class SalesExport implements FromCollection, WithHeadings, WithMapping, WithStyl
     public function collection()
     {
         $query = Sale::with(['user', 'shift', 'items.product'])
-            ->orderBy('transaction_date', 'desc');
+            ->orderBy('sale_date', 'desc');
 
         if ($this->startDate) {
-            $query->whereDate('transaction_date', '>=', $this->startDate);
+            $query->whereDate('sale_date', '>=', $this->startDate);
         }
 
         if ($this->endDate) {
-            $query->whereDate('transaction_date', '<=', $this->endDate);
+            $query->whereDate('sale_date', '<=', $this->endDate);
         }
 
         return $query->get();
@@ -56,14 +56,22 @@ class SalesExport implements FromCollection, WithHeadings, WithMapping, WithStyl
             'Kembalian',
             'Status',
             'Jumlah Item',
+            'Produk Terjual',
         ];
     }
 
     public function map($sale): array
     {
+        // Ambil nama produk dari items
+        $productNames = $sale->items->map(function ($item) {
+            $productName = $item->product->nama_dagang ?? '-';
+            $qty = $item->qty;
+            return "{$productName} (x{$qty})";
+        })->join(', ');
+
         return [
             $sale->invoice_no,
-            $sale->transaction_date->format('Y-m-d H:i:s'),
+            $sale->sale_date->format('Y-m-d H:i:s'),
             $sale->user->name ?? '-',
             $sale->shift ? "Shift #{$sale->shift->id}" : '-',
             $sale->customer_name ?? 'Umum',
@@ -76,6 +84,7 @@ class SalesExport implements FromCollection, WithHeadings, WithMapping, WithStyl
             $sale->change_amount,
             $sale->status,
             $sale->items->count(),
+            $productNames,
         ];
     }
 
@@ -112,6 +121,7 @@ class SalesExport implements FromCollection, WithHeadings, WithMapping, WithStyl
             'L' => 15, // Kembalian
             'M' => 12, // Status
             'N' => 12, // Jumlah Item
+            'O' => 40, // Produk Terjual
         ];
     }
 }

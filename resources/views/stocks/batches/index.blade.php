@@ -3,6 +3,11 @@
 @section('title', 'Stok per Batch')
 @section('page-title', 'Stok per Batch')
 
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+@endpush
+
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
@@ -21,7 +26,7 @@
         <form class="row g-2 align-items-end" method="GET" action="{{ route('stock-batches.index') }}">
             <div class="col-md-4">
                 <label class="form-label">Produk</label>
-                <select name="product_id" class="form-select">
+                <select name="product_id" id="productSelect" class="form-select" data-placeholder="Ketik untuk mencari produk...">
                     <option value="">Semua produk</option>
                     @foreach($products as $product)
                         <option value="{{ $product->id }}" {{ $searchProduct == $product->id ? 'selected' : '' }}>
@@ -112,3 +117,25 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#productSelect').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: 'Ketik untuk mencari produk...',
+            allowClear: true,
+            language: {
+                noResults: function() {
+                    return "Produk tidak ditemukan";
+                },
+                searching: function() {
+                    return "Mencari...";
+                }
+            }
+        });
+    });
+</script>
+@endpush

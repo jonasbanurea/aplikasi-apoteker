@@ -12,8 +12,8 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label">Produk</label>
-                    <select name="product_id" class="form-select @error('product_id') is-invalid @enderror" required>
-                        <option value="" disabled>Pilih produk</option>
+                    <select name="product_id" id="product-select" class="form-select @error('product_id') is-invalid @enderror" required>
+                        <option value="" disabled>Ketik untuk mencari produk...</option>
                         @foreach($products as $product)
                             <option value="{{ $product->id }}" {{ old('product_id', $batch->product_id) == $product->id ? 'selected' : '' }}>
                                 {{ $product->sku }} - {{ $product->nama_dagang }}
@@ -71,3 +71,28 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    $(document).ready(function() {
+        // Inisialisasi Select2 untuk dropdown produk
+        $('#product-select').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Ketik untuk mencari produk...',
+            allowClear: false,
+            width: '100%',
+            language: {
+                noResults: function() {
+                    return 'Produk tidak ditemukan';
+                },
+                searching: function() {
+                    return 'Mencari...';
+                },
+                inputTooShort: function() {
+                    return 'Ketik minimal 1 karakter';
+                }
+            }
+        });
+    });
+</script>
+@endpush

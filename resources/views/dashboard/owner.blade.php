@@ -154,23 +154,32 @@
                 <div class="row g-3">
                     @if($expired > 0)
                     <div class="col-md-3">
-                        <div class="alert alert-danger mb-0">
-                            <i class="bi bi-x-circle"></i> <strong>{{ $expired }}</strong> batch kadaluarsa
-                        </div>
+                        <a href="{{ route('stock-batches.near-expiry', ['status' => 'expired']) }}" class="text-decoration-none">
+                            <div class="alert alert-danger mb-0 hover-shadow">
+                                <i class="bi bi-x-circle"></i> <strong>{{ $expired }}</strong> batch kadaluarsa
+                                <i class="bi bi-arrow-right float-end"></i>
+                            </div>
+                        </a>
                     </div>
                     @endif
                     @if($nearExpired > 0)
                     <div class="col-md-3">
-                        <div class="alert alert-warning mb-0">
-                            <i class="bi bi-clock"></i> <strong>{{ $nearExpired }}</strong> batch hampir kadaluarsa
-                        </div>
+                        <a href="{{ route('stock-batches.near-expiry', ['status' => 'near_expired']) }}" class="text-decoration-none">
+                            <div class="alert alert-warning mb-0 hover-shadow">
+                                <i class="bi bi-clock"></i> <strong>{{ $nearExpired }}</strong> batch hampir kadaluarsa
+                                <i class="bi bi-arrow-right float-end"></i>
+                            </div>
+                        </a>
                     </div>
                     @endif
                     @if($reorderAlerts > 0)
                     <div class="col-md-3">
-                        <div class="alert alert-info mb-0">
-                            <i class="bi bi-box"></i> <strong>{{ $reorderAlerts }}</strong> obat perlu restock
-                        </div>
+                        <a href="{{ route('products.low-stock') }}" class="text-decoration-none">
+                            <div class="alert alert-info mb-0 hover-shadow">
+                                <i class="bi bi-box"></i> <strong>{{ $reorderAlerts }}</strong> obat perlu restock
+                                <i class="bi bi-arrow-right float-end"></i>
+                            </div>
+                        </a>
                     </div>
                     @endif
                     @if($duePayables > 0)

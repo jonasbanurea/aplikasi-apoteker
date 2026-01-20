@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Struk {{ $sale->invoice_no }}</title>
+    <title>Struk {{ $sale->invoice_no }} - Toko Obat Ro Tua</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         @page { size: 58mm auto; margin: 0; }
@@ -20,9 +20,23 @@
             padding: 2mm;
             margin: 0;
         }
+
         .center { text-align: center; }
         .right { text-align: right; }
         .bold { font-weight: bold; }
+        .store-name { 
+            text-align: center; 
+            font-weight: bold; 
+            font-size: 13px;
+            margin-bottom: 2px;
+            letter-spacing: 0.5px;
+        }
+        .store-address {
+            text-align: center;
+            font-size: 8px;
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
         .title { 
             text-align: center; 
             font-weight: bold; 
@@ -37,6 +51,11 @@
         }
         .line { 
             border-top: 1px dashed #000; 
+            margin: 3px 0;
+            width: 100%;
+        }
+        .double-line {
+            border-top: 2px solid #000;
             margin: 3px 0;
             width: 100%;
         }
@@ -63,12 +82,19 @@
         }
         .total-row {
             font-weight: bold;
-            font-size: 10px;
+            font-size: 11px;
+            margin-top: 2px;
         }
         .footer {
             text-align: center;
             font-size: 9px;
             margin-top: 4px;
+            line-height: 1.4;
+        }
+        .footer-thanks {
+            font-weight: bold;
+            font-size: 10px;
+            margin-bottom: 2px;
         }
         .btn-print { 
             display: block; 
@@ -87,7 +113,15 @@
 </head>
 <body>
     <div class="receipt">
-        <div class="title">{{ config('app.name') }}</div>
+        <div class="store-name">TOKO OBAT RO TUA</div>
+        <div class="store-address">
+            Jl. Saribu Dolok, Pematang Pane<br>
+            Kec. Panombean Panei<br>
+            Kab. Simalungun, Sumut
+        </div>
+        
+        <div class="double-line"></div>
+        
         <div class="info">
             Invoice: {{ $sale->invoice_no }}<br>
             Kasir: {{ $sale->user?->name ?? '-' }}<br>
@@ -123,8 +157,13 @@
             </div>
         </div>
         
-        <div class="line"></div>
-        <div class="footer">Terima Kasih</div>
+        <div class="double-line"></div>
+        <div class="footer">
+            <div class="footer-thanks">TERIMA KASIH</div>
+            Semoga Lekas Sembuh<br>
+            Barang yang sudah dibeli<br>
+            tidak dapat ditukar/dikembalikan
+        </div>
     </div>
 
     <button class="btn-print" onclick="window.print()">Cetak Struk</button>

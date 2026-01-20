@@ -12,7 +12,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
-class PurchasesExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithColumnWidths
+class PurchaseItemsExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithColumnWidths
 {
     protected $startDate;
     protected $endDate;
@@ -36,43 +36,58 @@ class PurchasesExport implements FromCollection, WithHeadings, WithMapping, With
             $query->whereDate('date', '<=', $this->endDate);
         }
 
-        return $query->get();
+        $purchases = $query->get();
+        
+        // Flatten items untuk setiap purchase
+        $flatData = collect();
+        foreach ($purchases as $purchase) {
+            foreach ($purchase->items as $item) {
+                $flatData->push([
+                    'purchase' => $purchase,
+                    'item' => $item
+                ]);
+            }
+        }
+        
+        return $flatData;
     }
 
     public function headings(): array
     {
         return [
             'No Invoice',
-            'Tanggal Pembelian',
+            'Tanggal',
             'Supplier',
             'Status',
-            'Jatuh Tempo',
-            'Subtotal (Rp)',
-            'Diskon (Rp)',
-            'Total (Rp)',
-            'Jumlah Item',
-            'Konsinyasi',
+            'SKU',
+            'Nama Produk',
+            'Batch No',
+            'Expired Date',
+            'Qty',
+            'Bonus',
+            'Harga Beli',
+            'Subtotal Item',
         ];
     }
 
-    public function map($purchase): array
+    public function map($data): array
     {
-        // Hitung subtotal dari items
-        $subtotal = $purchase->items->sum(function($item) {
-            return $item->qty * $item->cost_price;
-        });
+        $purchase = $data['purchase'];
+        $item = $data['item'];
         
         return [
             $purchase->invoice_no,
             $purchase->date->format('Y-m-d'),
             $purchase->supplier->nama ?? '-',
             $purchase->status,
-            $purchase->due_date ? $purchase->due_date->format('Y-m-d') : '-',
-            $subtotal,
-            $purchase->discount,
-            $purchase->total,
-            $purchase->items->count(),
-            $purchase->is_consignment ? 'Ya' : 'Tidak',
+            $item->product->sku ?? '-',
+            $item->product->nama_dagang ?? '-',
+            $item->batch_no ?? '-',
+            $item->expired_date ? $item->expired_date->format('Y-m-d') : '-',
+            $item->qty,
+            $item->bonus_qty ?? 0,
+            $item->cost_price,
+            $item->qty * $item->cost_price,
         ];
     }
 
@@ -96,15 +111,17 @@ class PurchasesExport implements FromCollection, WithHeadings, WithMapping, With
     {
         return [
             'A' => 20, // No Invoice
-            'B' => 18, // Tanggal
+            'B' => 15, // Tanggal
             'C' => 25, // Supplier
-            'D' => 15, // Status
-            'E' => 15, // Jatuh Tempo
-            'F' => 15, // Subtotal
-            'G' => 12, // Diskon
-            'H' => 15, // Total
-            'I' => 12, // Jumlah Item
-            'J' => 12, // Konsinyasi
+            'D' => 12, // Status
+            'E' => 15, // SKU
+            'F' => 30, // Nama Produk
+            'G' => 15, // Batch No
+            'H' => 15, // Expired Date
+            'I' => 10, // Qty
+            'J' => 10, // Bonus
+            'K' => 15, // Harga Beli
+            'L' => 15, // Subtotal Item
         ];
     }
 }
