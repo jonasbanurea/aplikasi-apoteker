@@ -141,6 +141,9 @@ class PurchaseController extends Controller
                     'user_id' => auth()->id(),
                     'notes' => 'Penerimaan ' . $purchase->invoice_no,
                 ]);
+
+                // Auto-update harga produk jika harga beli berbeda
+                $this->updateProductPrice($item['product'], $purchaseItem->cost_price);
             }
         });
 
@@ -293,6 +296,9 @@ class PurchaseController extends Controller
                     'user_id' => auth()->id(),
                     'notes' => 'Penerimaan ' . $purchase->invoice_no . ' (updated)',
                 ]);
+
+                // Auto-update harga produk jika harga beli berbeda
+                $this->updateProductPrice($item['product'], $purchaseItem->cost_price);
             }
         });
 
@@ -312,5 +318,62 @@ class PurchaseController extends Controller
 
         $filename = 'purchases-summary-' . date('Y-m-d') . '.xlsx';
         return Excel::download(new PurchasesExport($startDate, $endDate), $filename);
+    }
+
+    /**
+     * Auto-update harga produk berdasarkan harga beli batch terbaru
+     * 
+     * @param Product $product
+     * @param float $newCostPrice
+     * @return void
+     */
+    private function updateProductPrice(Product $product, float $newCostPrice)
+    {
+        // Cek apakah fitur auto-update aktif
+        if (!config('pricing.auto_update_price_on_purchase', true)) {
+            return;
+        }
+
+        $oldCostPrice = (float) $product->harga_beli;
+        
+        // Cek threshold: hanya update jika selisih signifikan
+        $threshold = config('pricing.price_update_threshold_percentage', 0.02); // 2%
+        if ($oldCostPrice > 0) {
+            $diffPercentage = abs($newCostPrice - $oldCostPrice) / $oldCostPrice;
+            if ($diffPercentage < $threshold) {
+                // Selisih terlalu kecil, skip update
+                return;
+            }
+        }
+
+        // Ambil margin sesuai golongan produk
+        $marginByGolongan = config('pricing.margin_by_golongan', []);
+        $margin = $marginByGolongan[$product->golongan] ?? config('pricing.default_margin_percentage', 0.20);
+
+        // Hitung harga jual baru
+        $newSellingPrice = $newCostPrice * (1 + $margin);
+
+        // Pembulatan harga jual
+        $roundTo = config('pricing.round_selling_price_to', 100);
+        if ($roundTo > 1) {
+            $newSellingPrice = ceil($newSellingPrice / $roundTo) * $roundTo;
+        }
+
+        // Update produk
+        $product->update([
+            'harga_beli' => $newCostPrice,
+            'harga_jual' => $newSellingPrice,
+        ]);
+
+        // Log perubahan (opsional, bisa dihapus jika tidak perlu)
+        \Log::info('Auto-update harga produk', [
+            'product_id' => $product->id,
+            'sku' => $product->sku,
+            'nama' => $product->nama_dagang,
+            'old_cost' => $oldCostPrice,
+            'new_cost' => $newCostPrice,
+            'new_selling' => $newSellingPrice,
+            'margin' => ($margin * 100) . '%',
+        ]);
     }
 }
